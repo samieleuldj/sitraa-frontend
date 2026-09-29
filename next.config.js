@@ -5,12 +5,12 @@ const nextConfig = {
     return [
       {
         source: '/admin',
-        destination: 'https://api.veloradz.shop/admin',
+        destination: 'https://api.sitraa.shop/admin',
         permanent: false,
       },
       {
         source: '/admin/:path*',
-        destination: 'https://api.veloradz.shop/admin/:path*',
+        destination: 'https://api.sitraa.shop/admin/:path*',
         permanent: false,
       },
     ];

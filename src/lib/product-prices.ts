@@ -1,7 +1,7 @@
 import type { Product } from '@/data/products';
 
 const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || 'https://api.confortdz.shop'
+  process.env.NEXT_PUBLIC_API_URL || 'https://api.sitraa.shop'
 ).replace(/\/$/, '');
 
 export type LivePriceOverride = {

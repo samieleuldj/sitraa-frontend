@@ -9,7 +9,7 @@ type TrackPayload = {
 };
 
 function getApiUrl(): string {
-  return process.env.NEXT_PUBLIC_API_URL || 'https://api.confortdz.shop';
+  return process.env.NEXT_PUBLIC_API_URL || 'https://api.sitraa.shop';
 }
 
 export function getSessionId(): string {

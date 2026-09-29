@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 
 const API_URL = (
-  process.env.NEXT_PUBLIC_API_URL || 'https://api.confortdz.shop'
+  process.env.NEXT_PUBLIC_API_URL || 'https://api.sitraa.shop'
 ).replace(/\/$/, '');
 
 export const LIVE_PRICE_EVENT = 'autoplus-live-price';
