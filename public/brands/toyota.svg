@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Toyota">
+  <rect width="64" height="64" rx="12" fill="#fff"/>
+  <ellipse cx="32" cy="32" rx="22" ry="14" fill="none" stroke="#EB0A1E" stroke-width="4"/>
+  <ellipse cx="32" cy="32" rx="14" ry="22" fill="none" stroke="#EB0A1E" stroke-width="4"/>
+  <ellipse cx="32" cy="32" rx="8" ry="8" fill="#EB0A1E"/>
+</svg>
