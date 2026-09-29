@@ -12,7 +12,7 @@ export const siteConfig = {
     'حجابات',
     'حجاب جزائري',
     'Sitraa',
-    'سitraa',
+    'سِتْرة',
     'دفع عند الاستلام',
     'توصيل 58 ولاية',
     'modest fashion',

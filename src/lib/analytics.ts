@@ -1,4 +1,4 @@
-const SESSION_KEY = 'veloradz_sid';
+const SESSION_KEY = 'sitraa_sid';
 
 type EventType = 'page_view' | 'product_view' | 'checkout_start' | 'whatsapp_lead';
 
