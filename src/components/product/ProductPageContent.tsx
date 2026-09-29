@@ -99,10 +99,10 @@ export default function ProductPageContent({
                   oldPrice={product.oldPrice}
                   size="xl"
                 />
-                {product.requiresVehicleInfo ? (
-                  <div className="flex items-center gap-2 text-sm text-red-700 font-bold bg-red-50 p-3 rounded-lg border border-red-100 mt-4">
-                    <span className="animate-pulse">🔥</span>
-                    طلب عالي — اختار ماركة وموديل سيارتك بالضبط
+                {product.requiresSizeInfo ? (
+                  <div className="flex items-center gap-2 text-sm text-primary font-bold bg-primary/10 p-3 rounded-lg border border-primary/20 mt-4">
+                    <span className="animate-pulse">✨</span>
+                    متاح بمقاسات مختلفة — اختاري مقاسك في الاستمارة
                   </div>
                 ) : (
                   <div className="flex items-center gap-2 text-sm text-green-700 font-bold bg-green-50 p-3 rounded-lg border border-green-100 mt-4">
@@ -116,9 +116,7 @@ export default function ProductPageContent({
                 productId={product.id}
                 productName={product.name}
                 price={product.price}
-                requiresVehicleInfo={product.requiresVehicleInfo}
-                initialBrandId={vehiclePreset?.brandId}
-                initialModelId={vehiclePreset?.modelId}
+                requiresSizeInfo={product.requiresSizeInfo}
               />
               <ConversionTrustBar />
             </div>
@@ -128,6 +126,21 @@ export default function ProductPageContent({
             {product.requiresVehicleInfo && <SupportedBrandsBar />}
 
             <div className="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-gray-100 mt-8">
+              {product.fabricInfo && (
+                <div className="mb-10 bg-secondary/20 p-6 rounded-xl border border-secondary/30">
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center text-xl shadow-sm">🧵</div>
+                    <h3 className="text-xl font-black text-text">تفاصيل القماش والخياطة</h3>
+                  </div>
+                  <p className="text-gray-700 font-medium leading-relaxed">{product.fabricInfo}</p>
+                  {product.careInstructions && (
+                    <p className="text-gray-500 text-sm mt-3 border-t border-secondary/40 pt-3">
+                      <strong>طريقة الغسل:</strong> {product.careInstructions}
+                    </p>
+                  )}
+                </div>
+              )}
+
               <div className="mb-10">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center text-xl">⚠️</div>

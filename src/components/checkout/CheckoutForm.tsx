@@ -38,7 +38,7 @@ interface CheckoutFormProps {
   productId: string;
   productName: string;
   price: number;
-  requiresVehicleInfo?: boolean;
+  requiresSizeInfo?: boolean;
   variant?: 'default' | 'automotive';
   initialBrandId?: string;
   initialModelId?: string;
@@ -48,13 +48,13 @@ export default function CheckoutForm({
   productId,
   productName,
   price,
-  requiresVehicleInfo = false,
+  requiresSizeInfo = false,
   variant = 'default',
   initialBrandId = '',
   initialModelId = '',
 }: CheckoutFormProps) {
   const siteHost = getSiteDisplayUrl();
-  const isAutomotive = variant === 'automotive';
+  const isAutomotive = false;
   const [livePrice, setLivePrice] = useState(price);
   const maxQuantity = livePrice >= 5000 ? 2 : 4;
   const [quantity, setQuantity] = useState(1);
@@ -72,11 +72,8 @@ export default function CheckoutForm({
   const [communeError, setCommuneError] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [deliveryError, setDeliveryError] = useState('');
-  const [carBrandId, setCarBrandId] = useState(initialBrandId);
-  const [carModelId, setCarModelId] = useState(initialModelId);
-  const [useManualVehicle, setUseManualVehicle] = useState(false);
-  const [vehicleManual, setVehicleManual] = useState('');
-  const [vehicleError, setVehicleError] = useState('');
+  const [selectedSize, setSelectedSize] = useState('');
+  const [sizeError, setSizeError] = useState('');
   const [communeManual, setCommuneManual] = useState(false);
   const carModels = getModelsForBrand(carBrandId);
   const checkoutTracked = useRef(false);
@@ -108,24 +105,18 @@ export default function CheckoutForm({
     });
   }, [productId, productName, unitPrice, quantity]);
 
-  const vehicleLabel = useMemo(() => {
-    if (useManualVehicle && vehicleManual.trim()) return vehicleManual.trim();
-    if (carBrandId && carModelId) return formatVehicleSelection(carBrandId, carModelId);
-    return '';
-  }, [useManualVehicle, vehicleManual, carBrandId, carModelId]);
-
   const whatsAppOrderUrl = useMemo(() => {
-    const vehicle = vehicleLabel;
+    const sizeStr = selectedSize;
     const lines = [
-      'سلام، بغيت نطلب موكات عازلة للكابو (3900 دج — COD).',
-      vehicle ? `سيارتي: ${vehicle}` : 'ماركة/موديل سيارتي: ',
+      `سلام، بغيت نطلب ${productName} (${unitPrice} دج — COD).`,
+      sizeStr ? `المقاس: ${sizeStr}` : '',
       wilaya ? `الولاية: ${wilaya}` : '',
       customerName.trim() ? `الاسم: ${customerName.trim()}` : '',
       phone.trim() ? `الهاتف: ${phone.trim()}` : '',
     ].filter(Boolean);
     const text = encodeURIComponent(lines.join('\n'));
     return `${STORE_WHATSAPP_URL}?text=${text}`;
-  }, [vehicleLabel, wilaya, customerName, phone]);
+  }, [selectedSize, wilaya, customerName, phone, productName, unitPrice]);
 
   const openWhatsAppOrder = () => {
     trackLead({ productId, productName, price: unitPrice, quantity });
@@ -245,20 +236,11 @@ export default function CheckoutForm({
       hasError = true;
     }
 
-    if (requiresVehicleInfo) {
-      if (useManualVehicle) {
-        if (vehicleManual.trim().length < 3) {
-          setVehicleError('اكتب ماركة وموديل سيارتك');
-          hasError = true;
-        } else {
-          setVehicleError('');
-        }
-      } else if (!carBrandId || !carModelId) {
-        setVehicleError('يرجى اختيار ماركة السيارة ثم الموديل');
-        hasError = true;
-      } else {
-        setVehicleError('');
-      }
+    if (requiresSizeInfo && !selectedSize) {
+      setSizeError('يرجى اختيار المقاس المناسب');
+      hasError = true;
+    } else {
+      setSizeError('');
     }
 
     if (hasError) {
@@ -275,7 +257,7 @@ export default function CheckoutForm({
 
     setIsSubmitting(true);
 
-    const vehicleNote = requiresVehicleInfo ? `السيارة: ${vehicleLabel}` : '';
+    const vehicleNote = requiresSizeInfo ? `المقاس: ${selectedSize}` : '';
     const discountNote = [vehicleNote, exitDiscount > 0 ? `خصم ${exitDiscount} دج (عرض خروج)` : '']
       .filter(Boolean)
       .join(' | ');
@@ -372,8 +354,8 @@ export default function CheckoutForm({
           أطلب الآن والدفع عند الاستلام
         </h3>
         <p className={`text-sm ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
-          {requiresVehicleInfo
-            ? 'اختار سيارتك بالضبط — نتصلو بيك للتأكيد قبل الإرسال'
+          {requiresSizeInfo
+            ? 'اختار المقاس المناسب ليك — نتصلو بيك للتأكيد قبل الإرسال'
             : 'يرجى إدخال معلوماتك وسنتصل بك للتأكيد'}
         </p>
       </div>

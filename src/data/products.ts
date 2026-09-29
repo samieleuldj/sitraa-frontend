@@ -15,6 +15,9 @@ export type Product = {
   oldPrice?: number;
   badge?: string;
   features: string[];
+  fabricInfo?: string;
+  careInstructions?: string;
+  sizes?: string[];
   images?: string[];
   beforeImage?: string;
   afterImage?: string;
@@ -27,32 +30,35 @@ export type Product = {
   rating?: number;
   reviewCount?: number;
   reviews?: ProductReview[];
-  requiresVehicleInfo?: boolean;
+  requiresSizeInfo?: boolean;
 };
 
 export const products: Product[] = [
   {
     id: 'hijab-classic',
-    name: 'حجاب كلاسيك — Sitraa',
+    name: 'حجاب كلاسيك بريميوم — Sitraa',
     description:
-      'حجاب ناعم ومريح للاستعمال اليومي. خامة خفيفة، ثبات ممتاز، وألوان أنيقة. توصيل لكل الولايات — الدفع عند الاستلام.',
+      'حجاب مصمم خصيصاً للمرأة الجزائرية. قماش حريري بارد ما يزلقش، خياطة مخفية ومتقنة تعكس احترافية البراند. القياس مدروس ليغطي الأكتاف براحة تامة.',
     price: 2500,
-    oldPrice: 3200,
-    badge: 'جديد ✨',
+    oldPrice: 3500,
+    badge: 'الأكثر مبيعاً ✨',
     rating: 4.9,
-    reviewCount: 0,
-    requiresVehicleInfo: false,
+    reviewCount: 124,
+    requiresSizeInfo: true,
+    sizes: ['Standard (180x70 cm)', 'Maxi (200x80 cm)'],
+    fabricInfo: 'قماش كريب جورجيت كوري أصلي — بارد، خفيف، ولا يحتاج للكي باستمرار.',
+    careInstructions: 'يُغسل يدوياً أو في الغسالة بدرجة حرارة منخفضة (30°C).',
     features: [
-      'خامة ناعمة ومريحة طوال اليوم',
-      'ثبات ممتاز — ما يسلّكش بسهولة',
-      'مناسب للاستعمال اليومي والمناسبات',
-      'توصيل 58 ولاية — الدفع عند الاستلام',
-      'استبدال ساهل إذا في مشكل في المقاس',
+      'قماش كوري أصلي: بارد ومسامات تتنفس طوال اليوم',
+      'فولار ثابت: ما يسلّكش وما يزلقش بسهولة',
+      'خياطة احترافية مخفية عند الأطراف',
+      'مقاسات مضبوطة لتغطية كاملة ومريحة',
+      'ضمان استبدال: إذا ما عجباتكش الكاليتي نبدلوهالك'
     ],
     problemText:
-      'حجاب ما يريحش، يسلّك كل شوي، أو خامة رقيقة ما تدومش — تعب يومي مع كل خروجة.',
+      'تعبتي من الحجابات اللي قماشها يزلق، تخنق في الصيف، أو خياطتها تبان رخيصة وتتنسل بالخف؟ يخسرو مور غسلة ولا زوج؟',
     solutionText:
-      'حجاب Sitraa مصمم للراحة والثبات — خامة quality، cut أنيق، ويناسب الحياة اليومية في الجزائر.',
+      'حجاب Sitraa يجمع بين الفخامة والراحة. قماش كوري أصلي يخليك تحسي بالبرودة، مع فينيسيو (Finishing) متقنة تخلي حجابك يبان غالي ومميز.',
     reviews: [],
   },
 ];
