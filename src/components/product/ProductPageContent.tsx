@@ -24,6 +24,7 @@ export default function ProductPageContent({
   hideBreadcrumb = false,
 }: Props) {
   const collection = getCollectionForProduct(product);
+  const isAbaya = product.productKind === 'abaya' || product.collectionId === 'abayas';
 
   return (
     <div className="bg-cream min-h-screen pb-24 max-w-lg mx-auto md:max-w-none">
@@ -71,7 +72,7 @@ export default function ProductPageContent({
           />
           <div className="flex items-center gap-2 text-xs text-primary font-bold bg-secondary/50 p-2.5 rounded-lg border border-secondary mt-4">
             <span className="w-2 h-2 rounded-full bg-accent animate-pulse shrink-0" />
-            متوفر — اختاري المقاس واللون في الاستمارة
+                {isAbaya ? 'متوفر — اختاري المقاس واللون' : 'متوفر — اختاري المقاس واللون في الاستمارة'}
           </div>
 
           {product.colors && product.colors.length > 0 && (
@@ -110,6 +111,7 @@ export default function ProductPageContent({
           careInstructions={product.careInstructions}
           weightG={product.weightG}
           stitchNote={product.stitchNote}
+          productKind={isAbaya ? 'abaya' : 'hijab'}
         />
 
         <HijabSizeGuide />

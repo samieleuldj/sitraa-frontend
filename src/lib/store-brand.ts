@@ -22,7 +22,7 @@ export const storeBrand = {
 
   accentClass: 'text-accent',
 
-  primaryProductId: 'hijab-classic',
+  primaryProductId: 'abaya-two-piece-sitraa',
 
 };
 

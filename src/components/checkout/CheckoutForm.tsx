@@ -20,9 +20,9 @@ import {
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
 import type { ProductColor } from '@/data/products';
-import { DEFAULT_HIJAB_SIZES } from '@/data/products';
+import { DEFAULT_SIZES as PRODUCT_DEFAULT_SIZES } from '@/data/products';
 
-const DEFAULT_SIZES = DEFAULT_HIJAB_SIZES;
+const DEFAULT_SIZES = PRODUCT_DEFAULT_SIZES;
 
 const WILAYAS = [
   "01 - أدرار", "02 - الشلف", "03 - الأغواط", "04 - أم البواقي", "05 - باتنة", "06 - بجاية", "07 - بسكرة", "08 - بشار", "09 - البليدة", "10 - البويرة",
@@ -437,7 +437,7 @@ export default function CheckoutForm({
                 <p className="text-xs mt-1 text-gray-500">الألوان الأكثر طلباً عند زبائن Sitraa</p>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-2">
+            <div className={`grid gap-2 ${colors.some((c) => c.image) ? 'grid-cols-3' : 'grid-cols-3'}`}>
               {colors.map((color) => (
                 <button
                   key={color.id}
@@ -452,10 +452,17 @@ export default function CheckoutForm({
                       : 'border-gray-200 bg-white'
                   }`}
                 >
-                  <span
-                    className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
-                    style={{ backgroundColor: color.hex }}
-                  />
+                  {color.image ? (
+                    <span className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 bg-secondary">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={color.image} alt={color.nameAr} className="h-full w-full object-cover object-top" />
+                    </span>
+                  ) : (
+                    <span
+                      className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  )}
                   <span className="text-[10px] font-bold text-text">{color.nameAr}</span>
                 </button>
               ))}
