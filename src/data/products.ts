@@ -1,3 +1,5 @@
+import { DEFAULT_SIZE_VALUES } from '@/data/sizes';
+
 export type ProductReview = {
   name: string;
   city: string;
@@ -72,7 +74,7 @@ export const ABAYA_TWO_PIECE_COLORS: ProductColor[] = [
   },
 ];
 
-export const DEFAULT_SIZES = ['38 – 42', '44 – 50'];
+export const DEFAULT_SIZES = DEFAULT_SIZE_VALUES;
 
 export const products: Product[] = [
   {

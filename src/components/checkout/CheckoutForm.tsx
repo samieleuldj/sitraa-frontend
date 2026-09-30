@@ -20,24 +20,22 @@ import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
 import CheckoutUpsellOffers from '@/components/checkout/CheckoutUpsellOffers';
 import type { ProductColor } from '@/data/products';
-import { DEFAULT_SIZES as PRODUCT_DEFAULT_SIZES } from '@/data/products';
+import { DEFAULT_SIZE_VALUES, SIZE_OPTIONS } from '@/data/sizes';
 import { bundlePrefKey, getUpsellForProduct } from '@/data/upsells';
 
 function calcProductSubtotal(
   unitPrice: number,
   qty: number,
   secondUnitDiscount?: number,
+  applySecondUnitPromo = false,
 ): number {
-  if (qty <= 1 || !secondUnitDiscount) return unitPrice * qty;
-  const discountedUnits = 1;
-  const fullUnits = qty - discountedUnits;
-  return (
-    fullUnits * unitPrice +
-    discountedUnits * Math.max(0, unitPrice - secondUnitDiscount)
-  );
+  if (qty <= 1 || !secondUnitDiscount || !applySecondUnitPromo) {
+    return unitPrice * qty;
+  }
+  return unitPrice + Math.max(0, unitPrice - secondUnitDiscount) * (qty - 1);
 }
 
-const DEFAULT_SIZES = PRODUCT_DEFAULT_SIZES;
+const DEFAULT_SIZES = DEFAULT_SIZE_VALUES;
 
 const WILAYAS = [
   "01 - أدرار", "02 - الشلف", "03 - الأغواط", "04 - أم البواقي", "05 - باتنة", "06 - بجاية", "07 - بسكرة", "08 - بشار", "09 - البليدة", "10 - البويرة",
@@ -94,6 +92,7 @@ export default function CheckoutForm({
   const [colorError, setColorError] = useState('');
   const [communeManual, setCommuneManual] = useState(false);
   const [addBundle, setAddBundle] = useState(false);
+  const [secondUnitPromo, setSecondUnitPromo] = useState(false);
   const checkoutTracked = useRef(false);
   const upsellConfig = getUpsellForProduct(productId);
 
@@ -106,11 +105,16 @@ export default function CheckoutForm({
 
   const unitPrice = livePrice - exitDiscount;
   const secondUnitDiscount = upsellConfig?.secondUnitDiscount;
-  const baseTotal = calcProductSubtotal(unitPrice, quantity, secondUnitDiscount);
+  const baseTotal = calcProductSubtotal(
+    unitPrice,
+    quantity,
+    secondUnitDiscount,
+    secondUnitPromo,
+  );
   const bundleTotal = addBundle && upsellConfig?.bundle ? upsellConfig.bundle.bundlePrice : 0;
   const total = baseTotal + bundleTotal + (deliveryCost ?? 0);
   const secondUnitSaving =
-    quantity >= 2 && secondUnitDiscount ? secondUnitDiscount : 0;
+    secondUnitPromo && quantity >= 2 && secondUnitDiscount ? secondUnitDiscount : 0;
 
   const trackCheckoutStart = useCallback(() => {
     if (checkoutTracked.current) return;
@@ -193,6 +197,12 @@ export default function CheckoutForm({
     setCommune('');
     setCommuneError('');
   }, [wilaya]);
+
+  useEffect(() => {
+    if (quantity < 2 && secondUnitPromo) {
+      setSecondUnitPromo(false);
+    }
+  }, [quantity, secondUnitPromo]);
 
   useEffect(() => {
     if (typeof window === 'undefined' || !upsellConfig?.bundle) return;
@@ -434,41 +444,34 @@ export default function CheckoutForm({
         </div>
 
         {requiresSizeInfo && (
-          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-4 relative z-10">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">👗</span>
-              <div>
-                <p className="text-sm font-black text-primary">المقاس *</p>
-                <p className="text-xs mt-1 text-gray-500">
-                  38–42 للمقاسات الصغيرة/المتوسطة · 44–50 للمقاسات الكبيرة
-                </p>
-              </div>
-            </div>
-            
-            <div className="grid grid-cols-1 gap-3">
-              {sizes.map((sizeOption) => (
+          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
+            <p className="text-xs font-black text-primary">المقاس *</p>
+            <div className="grid grid-cols-2 gap-2">
+              {SIZE_OPTIONS.filter((opt) => sizes.includes(opt.value)).map((opt) => (
                 <button
-                  key={sizeOption}
+                  key={opt.value}
                   type="button"
                   onClick={() => {
-                    setSelectedSize(sizeOption);
+                    setSelectedSize(opt.value);
                     setSizeError('');
                   }}
-                  className={`w-full text-right px-4 py-3 rounded-xl border ${
-                    selectedSize === sizeOption 
-                      ? 'border-primary bg-primary/10 font-bold text-primary' 
-                      : 'border-gray-200 bg-white hover:border-gray-300'
-                  } transition-all`}
+                  className={`text-right px-2.5 py-2 rounded-lg border transition-all ${
+                    selectedSize === opt.value
+                      ? 'border-primary bg-white font-bold text-primary shadow-sm'
+                      : 'border-secondary/80 bg-white text-text'
+                  }`}
                 >
-                  <div className="flex justify-between items-center">
-                    <span>{sizeOption}</span>
-                    {selectedSize === sizeOption && <span className="text-primary">✓</span>}
+                  <div className="flex items-center justify-between gap-1 mb-0.5">
+                    <span className="text-xs font-black">{opt.value}</span>
+                    <span className="text-[9px] font-bold text-mocha/70 bg-cream px-1.5 py-0.5 rounded-full">
+                      {opt.tag}
+                    </span>
                   </div>
+                  <p className="text-[10px] text-gray-500 leading-tight">{opt.hint}</p>
                 </button>
               ))}
             </div>
-            
-            {sizeError && <p className="text-red-500 text-xs mt-1 font-bold text-center">{sizeError}</p>}
+            {sizeError && <p className="text-red-500 text-[10px] font-bold">{sizeError}</p>}
           </div>
         )}
 
@@ -477,6 +480,8 @@ export default function CheckoutForm({
             config={upsellConfig}
             unitPrice={unitPrice}
             quantity={quantity}
+            secondUnitPromo={secondUnitPromo}
+            onSecondUnitPromoChange={setSecondUnitPromo}
             onQuantityChange={setQuantity}
             addBundle={addBundle}
             onBundleChange={setAddBundle}
