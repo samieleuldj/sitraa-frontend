@@ -183,7 +183,7 @@ export default function BrandHome({ products }: Props) {
             <div>
               <h2 className="text-2xl md:text-3xl font-black mb-4">علاش Sitraa؟</h2>
               <p className="text-secondary/90 leading-relaxed mb-6">
-                ما نبيعوش «حجاب أي» — نركز على القماش، الخياطة، المقاس، والfinishing.
+                ما نبيعوش «حجاب أي» — نركز على القماش، الخياطة، المقاس، والتشطيب.
                 جودة تبان من أول لمسة — حتى مامك تقول «هذا صح».
               </p>
               <ul className="space-y-3 text-sm">
