@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import type { ProductUpsellConfig } from '@/data/upsells';
+import { bundlePrefKey } from '@/data/upsells';
 import {
-  EXIT_DISCOUNT_DZD,
   markExitOfferShown,
   storeDiscount,
   wasExitOfferShown,
@@ -12,12 +13,10 @@ type ExitIntentOfferProps = {
   productId: string;
   productName: string;
   basePrice: number;
-  discount?: number;
+  upsell?: ProductUpsellConfig;
 };
 
-/** Ignore spurious popstate right after load (in-app browsers). */
 const MIN_PAGE_MS = 8000;
-/** Must interact with checkout before any offer can appear. */
 const MIN_FORM_DWELL_MS = 3000;
 
 function isTouchDevice(): boolean {
@@ -31,9 +30,9 @@ function isTouchDevice(): boolean {
 
 function trapHistory(): void {
   try {
-    window.history.pushState({ cdzExitTrap: Date.now() }, '', window.location.href);
+    window.history.pushState({ sitraaExitTrap: Date.now() }, '', window.location.href);
   } catch {
-    // بعض متصفحات in-app تمنع pushState
+    // in-app browsers
   }
 }
 
@@ -41,14 +40,19 @@ export default function ExitIntentOffer({
   productId,
   productName,
   basePrice,
-  discount = EXIT_DISCOUNT_DZD,
+  upsell,
 }: ExitIntentOfferProps) {
   const [open, setOpen] = useState(false);
   const shownRef = useRef(false);
   const pageStartRef = useRef(Date.now());
   const formFocusSinceRef = useRef<number | null>(null);
   const trapArmedRef = useRef(false);
-  const salePrice = basePrice - discount;
+
+  const exitType = upsell?.exitOffer?.type ?? 'discount';
+  const bundle = upsell?.bundle;
+  const discountAmount = upsell?.exitOffer?.discountAmount ?? 200;
+  const isBundleExit = exitType === 'bundle' && bundle;
+  const salePrice = basePrice - discountAmount;
 
   const canOffer = useCallback(() => {
     if (Date.now() - pageStartRef.current < MIN_PAGE_MS) return false;
@@ -75,7 +79,6 @@ export default function ExitIntentOffer({
     if (wasExitOfferShown(productId)) return;
 
     pageStartRef.current = Date.now();
-
     const form = document.getElementById('order-form');
 
     const onFormFocusIn = () => {
@@ -102,16 +105,8 @@ export default function ExitIntentOffer({
       showOnce();
     };
 
-    const onPageShow = (event: PageTransitionEvent) => {
-      if (event.persisted && trapArmedRef.current) {
-        trapHistory();
-      }
-    };
-
     form?.addEventListener('focusin', onFormFocusIn);
     window.addEventListener('popstate', onPopState);
-    window.addEventListener('pageshow', onPageShow);
-
     if (!isTouchDevice()) {
       document.addEventListener('mouseleave', onMouseLeave);
     }
@@ -119,7 +114,6 @@ export default function ExitIntentOffer({
     return () => {
       form?.removeEventListener('focusin', onFormFocusIn);
       window.removeEventListener('popstate', onPopState);
-      window.removeEventListener('pageshow', onPageShow);
       document.removeEventListener('mouseleave', onMouseLeave);
     };
   }, [productId, showOnce, armTrapIfReady, canOffer]);
@@ -133,17 +127,26 @@ export default function ExitIntentOffer({
     };
   }, [open]);
 
-  const acceptOffer = () => {
-    storeDiscount(productId, discount);
-    setOpen(false);
+  const scrollToForm = () => {
     const form = document.getElementById('order-form');
-    if (form) {
-      form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
+    form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   };
 
-  const closeOffer = () => {
+  const acceptBundle = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(bundlePrefKey(productId), '1');
+      window.dispatchEvent(
+        new CustomEvent('sitraa-bundle-pref', { detail: { productId } }),
+      );
+    }
     setOpen(false);
+    scrollToForm();
+  };
+
+  const acceptDiscount = () => {
+    storeDiscount(productId, discountAmount);
+    setOpen(false);
+    scrollToForm();
   };
 
   if (!open) return null;
@@ -151,49 +154,66 @@ export default function ExitIntentOffer({
   return (
     <div
       className="fixed inset-0 z-[9999] flex items-end sm:items-center justify-center p-4 bg-black/60"
-      onClick={closeOffer}
+      onClick={() => setOpen(false)}
     >
       <div
         className="w-full max-w-md bg-white rounded-3xl shadow-2xl overflow-hidden"
         role="dialog"
         aria-modal="true"
-        aria-labelledby="exit-offer-title"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="bg-gradient-to-l from-accent to-orange-500 px-6 py-5 text-white text-center">
+        <div className="bg-gradient-to-l from-primary to-accent px-6 py-5 text-white text-center">
           <div className="text-3xl mb-2">🎁</div>
-          <h2 id="exit-offer-title" className="text-xl font-black">
-            قبل ما تخرجي... عرض خاص!
-          </h2>
-          <p className="text-sm text-white/90 mt-1">مرة واحدة فقط — اليوم</p>
+          <h2 className="text-xl font-black">ستني! عرض قبل ما تخرجي</h2>
+          <p className="text-sm text-white/90 mt-1">مرة وحدة — ما تتكررش</p>
         </div>
 
         <div className="p-6 text-center">
-          <p className="text-gray-600 leading-relaxed mb-4">
-            حبينا نسهّلو عليكِ الطلب على{' '}
-            <span className="font-bold text-gray-800">{productName}</span>
-          </p>
-
-          <div className="bg-green-50 border border-green-100 rounded-2xl p-4 mb-5">
-            <div className="text-sm text-gray-500 line-through">{basePrice} دج</div>
-            <div className="text-3xl font-black text-primary">{salePrice} دج</div>
-            <div className="text-sm font-bold text-green-700 mt-1">
-              خصم {discount} دج — الدفع عند الاستلام
-            </div>
-          </div>
+          {isBundleExit && bundle ? (
+            <>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                مع <span className="font-bold text-text">{productName}</span> — زيدي{' '}
+                <span className="font-bold text-text">{bundle.nameAr}</span> بثمن ما يتعوضش
+              </p>
+              <div className="bg-secondary/40 border border-secondary rounded-2xl p-4 mb-5">
+                <div className="text-sm text-gray-500 line-through">{bundle.standalonePrice} دج</div>
+                <div className="text-3xl font-black text-primary">{bundle.bundlePrice} دج</div>
+                <div className="text-xs font-bold text-accent mt-1">مع طلبك — الدفع كي توصلك</div>
+              </div>
+              <button
+                type="button"
+                onClick={acceptBundle}
+                className="w-full bg-accent active:bg-primary text-white font-black text-lg py-4 rounded-xl shadow-lg mb-3"
+              >
+                نعم — زيدي {bundle.nameAr} ب {bundle.bundlePrice} دج
+              </button>
+            </>
+          ) : (
+            <>
+              <p className="text-gray-600 text-sm leading-relaxed mb-4">
+                خصم خاص على <span className="font-bold text-text">{productName}</span>
+              </p>
+              <div className="bg-green-50 border border-green-100 rounded-2xl p-4 mb-5">
+                <div className="text-sm text-gray-500 line-through">{basePrice} دج</div>
+                <div className="text-3xl font-black text-primary">{salePrice} دج</div>
+                <div className="text-sm font-bold text-green-700 mt-1">
+                  توفّري {discountAmount} دج — COD
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={acceptDiscount}
+                className="w-full bg-accent active:bg-primary text-white font-black text-lg py-4 rounded-xl shadow-lg mb-3"
+              >
+                استعملي الخصم وأكملي الطلب
+              </button>
+            </>
+          )}
 
           <button
             type="button"
-            onClick={acceptOffer}
-            className="w-full bg-accent hover:bg-accent/90 text-white font-black text-lg py-4 rounded-xl shadow-lg mb-3"
-          >
-            استعملي الخصم وأطلبي الآن
-          </button>
-
-          <button
-            type="button"
-            onClick={closeOffer}
-            className="w-full text-gray-400 text-sm py-2 hover:text-gray-600"
+            onClick={() => setOpen(false)}
+            className="w-full text-gray-400 text-sm py-2"
           >
             لا شكراً
           </button>

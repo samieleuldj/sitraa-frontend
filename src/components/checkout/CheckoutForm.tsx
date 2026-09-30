@@ -14,13 +14,28 @@ import { storePendingPurchase, trackInitiateCheckout, trackLead } from '@/lib/pi
 import { STORE_WHATSAPP_URL } from '@/lib/store';
 import {
   DISCOUNT_EVENT,
-  EXIT_DISCOUNT_DZD,
   getStoredDiscount,
 } from '@/lib/product-discount';
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
+import CheckoutUpsellOffers from '@/components/checkout/CheckoutUpsellOffers';
 import type { ProductColor } from '@/data/products';
 import { DEFAULT_SIZES as PRODUCT_DEFAULT_SIZES } from '@/data/products';
+import { bundlePrefKey, getUpsellForProduct } from '@/data/upsells';
+
+function calcProductSubtotal(
+  unitPrice: number,
+  qty: number,
+  secondUnitDiscount?: number,
+): number {
+  if (qty <= 1 || !secondUnitDiscount) return unitPrice * qty;
+  const discountedUnits = 1;
+  const fullUnits = qty - discountedUnits;
+  return (
+    fullUnits * unitPrice +
+    discountedUnits * Math.max(0, unitPrice - secondUnitDiscount)
+  );
+}
 
 const DEFAULT_SIZES = PRODUCT_DEFAULT_SIZES;
 
@@ -78,7 +93,9 @@ export default function CheckoutForm({
   const [selectedColor, setSelectedColor] = useState('');
   const [colorError, setColorError] = useState('');
   const [communeManual, setCommuneManual] = useState(false);
+  const [addBundle, setAddBundle] = useState(false);
   const checkoutTracked = useRef(false);
+  const upsellConfig = getUpsellForProduct(productId);
 
   const shippingRate = useMemo(() => getShippingRate(wilaya), [wilaya]);
   const communes = useMemo(() => getCommunesForWilaya(wilaya), [wilaya]);
@@ -88,8 +105,12 @@ export default function CheckoutForm({
   }, [wilaya, deliveryType]);
 
   const unitPrice = livePrice - exitDiscount;
-  const baseTotal = unitPrice * quantity;
-  const total = baseTotal + (deliveryCost ?? 0);
+  const secondUnitDiscount = upsellConfig?.secondUnitDiscount;
+  const baseTotal = calcProductSubtotal(unitPrice, quantity, secondUnitDiscount);
+  const bundleTotal = addBundle && upsellConfig?.bundle ? upsellConfig.bundle.bundlePrice : 0;
+  const total = baseTotal + bundleTotal + (deliveryCost ?? 0);
+  const secondUnitSaving =
+    quantity >= 2 && secondUnitDiscount ? secondUnitDiscount : 0;
 
   const trackCheckoutStart = useCallback(() => {
     if (checkoutTracked.current) return;
@@ -172,6 +193,23 @@ export default function CheckoutForm({
     setCommune('');
     setCommuneError('');
   }, [wilaya]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !upsellConfig?.bundle) return;
+    if (sessionStorage.getItem(bundlePrefKey(productId)) === '1') {
+      setAddBundle(true);
+    }
+
+    const onBundlePref = (event: Event) => {
+      const detail = (event as CustomEvent<{ productId: string }>).detail;
+      if (detail?.productId === productId) {
+        setAddBundle(true);
+      }
+    };
+
+    window.addEventListener('sitraa-bundle-pref', onBundlePref);
+    return () => window.removeEventListener('sitraa-bundle-pref', onBundlePref);
+  }, [productId, upsellConfig?.bundle]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -268,9 +306,15 @@ export default function CheckoutForm({
       requiresSizeInfo && selectedSize ? `المقاس: ${selectedSize}` : '',
       requiresColorInfo && colorLabel ? `اللون: ${colorLabel}` : '',
     ].filter(Boolean);
-    const discountNote = [...optionNotes, exitDiscount > 0 ? `خصم ${exitDiscount} دج (عرض خروج)` : '']
-      .filter(Boolean)
-      .join(' | ');
+    const promoNotes = [
+      ...optionNotes,
+      exitDiscount > 0 ? `خصم خروج: ${exitDiscount} دج` : '',
+      secondUnitSaving > 0 ? `عرض وحدة 2: -${secondUnitSaving} دج` : '',
+      addBundle && upsellConfig?.bundle
+        ? `عرض مجموعة: ${upsellConfig.bundle.nameAr} — ${upsellConfig.bundle.bundlePrice} دج`
+        : '',
+    ].filter(Boolean);
+    const discountNote = promoNotes.join(' | ');
 
     const orderId = `ORD-${Math.floor(100000 + Math.random() * 900000)}`;
     const orderData = {
@@ -360,13 +404,13 @@ export default function CheckoutForm({
       id="order-form"
     >
       <div className="mb-6 text-center">
-        <h3 className={`text-2xl font-black mb-2 ${isAutomotive ? 'text-white' : 'text-text'}`}>
-          أطلب الآن والدفع عند الاستلام
+        <h3 className={`text-xl font-black mb-2 ${isAutomotive ? 'text-white' : 'text-text'}`}>
+          أطلبي دابا — الدفع كي توصلك
         </h3>
-        <p className={`text-sm ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
+        <p className={`text-xs ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
           {requiresSizeInfo
-            ? 'اختار المقاس المناسب ليك — نتصلو بيك للتأكيد قبل الإرسال'
-            : 'يرجى إدخال معلوماتك وسنتصل بك للتأكيد'}
+            ? 'اختاري المقاس واللون — نتصلو بيك للتأكيد قبل ما نبعثو'
+            : 'عمري المعلومات — نتصلو بيك للتأكيد'}
         </p>
       </div>
 
@@ -426,6 +470,18 @@ export default function CheckoutForm({
             
             {sizeError && <p className="text-red-500 text-xs mt-1 font-bold text-center">{sizeError}</p>}
           </div>
+        )}
+
+        {upsellConfig && (upsellConfig.secondUnitDiscount || upsellConfig.bundle) && (
+          <CheckoutUpsellOffers
+            config={upsellConfig}
+            unitPrice={unitPrice}
+            quantity={quantity}
+            onQuantityChange={setQuantity}
+            addBundle={addBundle}
+            onBundleChange={setAddBundle}
+            maxQuantity={maxQuantity}
+          />
         )}
 
         {requiresColorInfo && colors.length > 0 && (
@@ -635,17 +691,29 @@ export default function CheckoutForm({
         <div className="bg-gray-50 p-4 rounded-xl mt-6 border border-gray-200">
           {exitDiscount > 0 && (
             <div className="flex justify-between text-green-700 mb-2 text-sm">
-              <span>🎁 خصم عرض الخروج ({EXIT_DISCOUNT_DZD} دج):</span>
-              <span className="font-bold">-{exitDiscount * quantity} دج</span>
+              <span>🎁 خصم عرض الخروج:</span>
+              <span className="font-bold">-{exitDiscount} دج/قطعة</span>
             </div>
           )}
-          <div className="flex justify-between text-gray-600 mb-2">
+          {secondUnitSaving > 0 && (
+            <div className="flex justify-between text-green-700 mb-2 text-sm">
+              <span>🎁 عرض الوحدة الثانية:</span>
+              <span className="font-bold">-{secondUnitSaving} دج</span>
+            </div>
+          )}
+          {addBundle && upsellConfig?.bundle && (
+            <div className="flex justify-between text-primary mb-2 text-sm font-bold">
+              <span>+ {upsellConfig.bundle.nameAr}</span>
+              <span>{upsellConfig.bundle.bundlePrice} دج</span>
+            </div>
+          )}
+          <div className="flex justify-between text-gray-600 mb-2 text-sm">
             <span>
-              سعر المنتج ({quantity} × {unitPrice} دج):
+              {productName} ({quantity} {quantity === 1 ? 'قطعة' : 'قطع'})
             </span>
             <span className="font-bold">{baseTotal} دج</span>
           </div>
-          <div className="flex justify-between text-gray-600 mb-2">
+          <div className="flex justify-between text-gray-600 mb-2 text-sm">
             <span>
               التوصيل
               {deliveryType === 'home' ? ' (منزل)' : ' (مكتب)'}:
@@ -654,9 +722,9 @@ export default function CheckoutForm({
               {deliveryCost !== null ? `${deliveryCost} دج` : '—'}
             </span>
           </div>
-          <div className="border-t border-gray-200 my-2 pt-2 flex justify-between text-lg">
-            <span className="font-black text-text">المجموع الكلي:</span>
-            <span className="font-black text-primary text-xl">{total} دج</span>
+          <div className="border-t border-gray-200 my-2 pt-2 flex justify-between">
+            <span className="font-black text-text">المجموع:</span>
+            <span className="font-black text-primary text-lg">{total} دج</span>
           </div>
         </div>
 

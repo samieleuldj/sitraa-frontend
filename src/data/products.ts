@@ -40,6 +40,7 @@ export type Product = {
   requiresSizeInfo?: boolean;
   requiresColorInfo?: boolean;
   productKind?: 'hijab' | 'abaya';
+  finishingImages?: { src: string; label: string }[];
 };
 
 export const DEFAULT_HIJAB_COLORS: ProductColor[] = [

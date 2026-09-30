@@ -17,7 +17,7 @@ const ABAYA_DETAILS = [
   { icon: '👗', title: 'الطقم', desc: 'قطعتين — فستان + درّاعة مفتوحة منسقين' },
   { icon: '✨', title: 'الستايل', desc: 'أكمام واسعة — look عصري وأنيق' },
   { icon: '🧵', title: 'الخياطة', desc: 'تشطيب متقن — جودة تبان من أول لمسة' },
-  { icon: '🌸', title: 'المناسبة', desc: 'للخروج اليومي والمناسبات' },
+  { icon: '🌸', title: 'المناسبة', desc: 'للخروج اليومي والمناسبات والأعراس' },
 ];
 
 export default function HijabCraftDetails({

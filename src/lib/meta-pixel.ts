@@ -1,23 +1,23 @@
-/** Meta Pixel ID per product landing page (separate ad accounts). */
-const HOOD_PIXEL_ID =
-  process.env.NEXT_PUBLIC_META_PIXEL_HOOD ||
+/** Meta Pixel — Sitraa (منفصل على Confort) */
+
+const SITRAA_PIXEL_ID =
   process.env.NEXT_PUBLIC_META_PIXEL_ID ||
   process.env.META_PIXEL_ID ||
-  '1108478241547299';
+  '';
 
 const PIXEL_BY_PRODUCT: Record<string, string | undefined> = {
-  'hood-insulation-mat': HOOD_PIXEL_ID,
-  'cellulite-device':
-    process.env.NEXT_PUBLIC_META_PIXEL_CELLULITE ||
-    process.env.NEXT_PUBLIC_META_PIXEL_ID ||
-    process.env.META_PIXEL_ID,
-  'mini-clima-geant':
-    process.env.NEXT_PUBLIC_META_PIXEL_MINI_CLIMA_GEANT || '1061415349433201',
-  'thermal-massage-brace':
-    process.env.NEXT_PUBLIC_META_PIXEL_THERMAL_MASSAGE || '1280276840966709',
+  'abaya-two-piece-sitraa':
+    process.env.NEXT_PUBLIC_META_PIXEL_ABAYA || SITRAA_PIXEL_ID,
+  'hijab-classic':
+    process.env.NEXT_PUBLIC_META_PIXEL_HIJAB_CLASSIC || SITRAA_PIXEL_ID,
+  'hijab-sharia-sitraa':
+    process.env.NEXT_PUBLIC_META_PIXEL_SHARIA || SITRAA_PIXEL_ID,
 };
 
-const LANDING_PATHS = new Set(['/', '/product/hood-insulation-mat']);
+export function getDefaultMetaPixelId(): string {
+  const id = SITRAA_PIXEL_ID.trim();
+  return id === 'your_meta_pixel_id' ? '' : id;
+}
 
 export function getMetaPixelIdForProduct(productId: string): string {
   const specific = PIXEL_BY_PRODUCT[productId]?.trim();
@@ -27,19 +27,12 @@ export function getMetaPixelIdForProduct(productId: string): string {
   return getDefaultMetaPixelId();
 }
 
-export function getDefaultMetaPixelId(): string {
-  const id = HOOD_PIXEL_ID.trim();
-  return id === 'your_meta_pixel_id' ? '' : id;
-}
-
 export function getMetaPixelIdForPath(pathname: string | null): string {
-  if (pathname && LANDING_PATHS.has(pathname)) {
-    return getMetaPixelIdForProduct('hood-insulation-mat');
-  }
+  if (!pathname) return getDefaultMetaPixelId();
 
-  const match = pathname?.match(/^\/product\/([^/?#]+)/);
-  if (match) {
-    return getMetaPixelIdForProduct(decodeURIComponent(match[1]));
+  const productMatch = pathname.match(/^\/product\/([^/?#]+)/);
+  if (productMatch) {
+    return getMetaPixelIdForProduct(decodeURIComponent(productMatch[1]));
   }
 
   return getDefaultMetaPixelId();

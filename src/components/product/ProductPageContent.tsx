@@ -7,8 +7,12 @@ import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
 import StickyOrderBar from '@/components/product/StickyOrderBar';
 import HijabSizeGuide from '@/components/product/HijabSizeGuide';
 import HijabCraftDetails from '@/components/product/HijabCraftDetails';
+import ProductFinishingGallery from '@/components/product/ProductFinishingGallery';
 import ProductVideoPlayer from '@/components/product/ProductVideoPlayer';
+import ExitIntentOffer from '@/components/product/ExitIntentOffer';
+import ProductViewPixel from '@/components/tracking/ProductViewPixel';
 import type { Product, ProductReview } from '@/data/products';
+import { getUpsellForProduct } from '@/data/upsells';
 import { getCollectionForProduct } from '@/lib/collections';
 import { storeBrand } from '@/lib/store-brand';
 
@@ -25,9 +29,17 @@ export default function ProductPageContent({
 }: Props) {
   const collection = getCollectionForProduct(product);
   const isAbaya = product.productKind === 'abaya' || product.collectionId === 'abayas';
+  const upsellConfig = getUpsellForProduct(product.id);
 
   return (
     <div className="bg-cream min-h-screen pb-24 max-w-lg mx-auto md:max-w-none">
+      <ProductViewPixel productId={product.id} productName={product.name} price={product.price} />
+      <ExitIntentOffer
+        productId={product.id}
+        productName={product.name}
+        basePrice={product.price}
+        upsell={upsellConfig}
+      />
       {!hideBreadcrumb && (
         <div className="bg-white/80 border-b border-secondary">
           <div className="px-4 py-2.5 text-xs text-gray-500 flex items-center gap-2 flex-wrap">
@@ -115,6 +127,8 @@ export default function ProductPageContent({
         />
 
         <HijabSizeGuide />
+
+        <ProductFinishingGallery shots={product.finishingImages} />
 
         {product.videoFile ? (
           <section className="bg-white p-5 rounded-2xl border border-secondary">

@@ -61,7 +61,7 @@ export default function ProductPriceDisplay({
 
   const unitPrice = livePrice - discount;
   const sizeClass =
-    size === 'xl' ? 'text-4xl' : size === 'lg' ? 'text-3xl' : 'text-2xl';
+    size === 'xl' ? 'text-2xl' : size === 'lg' ? 'text-xl' : 'text-lg';
 
   return (
     <div className="flex items-center gap-4 flex-wrap">
