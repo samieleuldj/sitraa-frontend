@@ -379,87 +379,42 @@ export default function CheckoutForm({
           {nameError && <p className="text-red-500 text-xs mt-1 font-bold">{nameError}</p>}
         </div>
 
-        {requiresVehicleInfo && (
-          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-blue-50 to-white p-4 space-y-4 relative z-10">
+        {requiresSizeInfo && (
+          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-4 relative z-10">
             <div className="flex items-start gap-3">
-              <span className="text-2xl">🚗</span>
+              <span className="text-2xl">👗</span>
               <div>
-                <p className="text-sm font-black text-primary">معلومات سيارتك *</p>
+                <p className="text-sm font-black text-primary">المقاس *</p>
                 <p className="text-xs mt-1 text-gray-500">
-                  اختار الماركة ثم الموديل بالضبط — باش نوجهّزلك الموكات المناسبة
+                  اختار المقاس لي يناسبك باش نوصلولك الحجاب المثالي
                 </p>
               </div>
             </div>
-            <button
-              type="button"
-              onClick={() => {
-                setUseManualVehicle((v) => !v);
-                setVehicleError('');
-              }}
-              className="text-sm font-bold text-primary underline"
-            >
-              {useManualVehicle ? '← رجّع للقائمة' : 'ما لقيتش سيارتي — نكتبها هنا'}
-            </button>
-            {useManualVehicle && (
-              <input
-                type="text"
-                value={vehicleManual}
-                onChange={(e) => {
-                  setVehicleManual(e.target.value);
-                  setVehicleError('');
-                }}
-                placeholder="مثال: Clio 3 — 2010"
-                className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary outline-none"
-              />
-            )}
-            {!useManualVehicle && (
+            
             <div className="grid grid-cols-1 gap-3">
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">
-                  ماركة السيارة *
-                </label>
-                <CarBrandPicker
-                  value={carBrandId}
-                  onChange={(brandId) => {
-                    setCarBrandId(brandId);
-                    setCarModelId('');
-                    setVehicleError('');
+              {['Standard (180x70 cm)', 'Maxi (200x80 cm)'].map((sizeOption) => (
+                <button
+                  key={sizeOption}
+                  type="button"
+                  onClick={() => {
+                    setSelectedSize(sizeOption);
+                    setSizeError('');
                   }}
-                />
-                <input type="hidden" name="car_brand" value={carBrandId} required={requiresVehicleInfo} />
-              </div>
-              <div>
-                <label htmlFor="car_model" className="block text-sm font-bold text-gray-700 mb-1">
-                  موديل السيارة *
-                </label>
-                <select
-                  id="car_model"
-                  name="car_model"
-                  required
-                  value={carModelId}
-                  disabled={!carBrandId}
-                  onChange={(e) => {
-                    setCarModelId(e.target.value);
-                    setVehicleError('');
-                  }}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-primary outline-none bg-white font-medium text-gray-900 disabled:bg-gray-100 disabled:text-gray-400"
+                  className={`w-full text-right px-4 py-3 rounded-xl border ${
+                    selectedSize === sizeOption 
+                      ? 'border-primary bg-primary/10 font-bold text-primary' 
+                      : 'border-gray-200 bg-white hover:border-gray-300'
+                  } transition-all`}
                 >
-                  <option value="">
-                    {carBrandId ? '— اختر الموديل —' : 'اختر الماركة أولاً'}
-                  </option>
-                  {carModels.map((model) => (
-                    <option key={model.id} value={model.id}>{model.label}</option>
-                  ))}
-                </select>
-              </div>
+                  <div className="flex justify-between items-center">
+                    <span>{sizeOption}</span>
+                    {selectedSize === sizeOption && <span className="text-primary">✓</span>}
+                  </div>
+                </button>
+              ))}
             </div>
-            )}
-            {!useManualVehicle && carBrandId && carModelId && (
-              <p className="text-xs font-bold text-green-700 bg-green-50 border border-green-100 rounded-lg px-3 py-2.5">
-                ✓ تم الاختيار: {formatVehicleSelection(carBrandId, carModelId)}
-              </p>
-            )}
-            {vehicleError && <p className="text-red-500 text-xs font-bold">{vehicleError}</p>}
+            
+            {sizeError && <p className="text-red-500 text-xs mt-1 font-bold text-center">{sizeError}</p>}
           </div>
         )}
 
