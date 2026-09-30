@@ -9,6 +9,7 @@ export type ProductReview = {
 
 export type Product = {
   id: string;
+  collectionId?: 'hijabs' | 'sharia-hijabs' | 'abayas';
   name: string;
   description: string;
   price: number;
@@ -34,6 +35,7 @@ export type Product = {
 export const products: Product[] = [
   {
     id: 'hijab-classic',
+    collectionId: 'hijabs',
     name: 'حجاب كلاسيك بريميوم — Sitraa',
     description:
       'حجاب مصمم للمرأة الجزائرية — قماش كوري أصلي، خياطة متقنة، ومقاسات واضحة. جودة تبان من أول لمسة.',
