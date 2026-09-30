@@ -1,223 +1,177 @@
-import Link from 'next/link';
-import Image from 'next/image';
-import { collections } from '@/data/collections';
-import type { Product } from '@/data/products';
-import { storeBrand } from '@/lib/store-brand';
-
-type Props = {
-  products: Product[];
-};
-
-function ProductCard({ product }: { product: Product }) {
-  const image = product.images?.[0];
-
-  return (
-    <article className="bg-white rounded-2xl border border-secondary overflow-hidden shadow-sm hover:shadow-md transition-shadow flex flex-col">
-      <Link href={`/product/${product.id}`} className="block relative aspect-[4/5] bg-gradient-to-br from-secondary to-cream">
-        {image ? (
-          <Image
-            src={image}
-            alt={product.name}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, 33vw"
-          />
-        ) : (
-          <div className="absolute inset-0 flex flex-col items-center justify-center text-mocha/50">
-            <span className="text-4xl mb-2">🧕</span>
-            <span className="text-xs font-medium">صورة قريباً</span>
-          </div>
-        )}
-        {product.badge && (
-          <span className="absolute top-3 right-3 bg-accent text-white text-xs font-bold px-3 py-1 rounded-full">
-            {product.badge}
-          </span>
-        )}
-      </Link>
-      <div className="p-5 flex flex-col flex-1">
-        <Link href={`/product/${product.id}`}>
-          <h3 className="font-black text-text leading-snug mb-2 hover:text-primary transition-colors">
-            {product.name}
-          </h3>
-        </Link>
-        <p className="text-sm text-gray-500 line-clamp-2 mb-4 flex-1">{product.description}</p>
-        <div className="flex items-center gap-2 mb-4">
-          <span className="text-2xl font-black text-primary">{product.price} دج</span>
-          {product.oldPrice && (
-            <span className="text-sm text-gray-400 line-through">{product.oldPrice} دج</span>
-          )}
-        </div>
-        <Link
-          href={`/product/${product.id}#order-form`}
-          className="block text-center bg-accent hover:bg-primary text-white font-bold py-3 rounded-xl transition-colors"
-        >
-          اطلبي الآن
-        </Link>
-      </div>
-    </article>
-  );
-}
-
-export default function BrandHome({ products }: Props) {
-  const bestSellers = products.filter((p) => p.badge?.includes('الأكثر') || p.rating && p.rating >= 4.8);
-  const featured = products.find((p) => p.id === storeBrand.primaryProductId) ?? products[0];
-
-  return (
-    <div className="bg-cream">
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-secondary">
-        <div className="absolute inset-0 bg-gradient-to-bl from-secondary/60 via-cream to-white pointer-events-none" />
-        <div className="container mx-auto px-4 py-14 md:py-20 relative">
-          <div className="max-w-2xl">
-            <p className="text-accent font-bold text-sm tracking-widest mb-3">{storeBrand.tagline}</p>
-            <h1 className="text-4xl md:text-5xl font-black text-text leading-tight mb-4">
-              {storeBrand.nameAr}
-              <span className="text-accent">.</span>
-              <span className="block text-2xl md:text-3xl font-bold text-mocha mt-2">
-                {storeBrand.taglineAr}
-              </span>
-            </h1>
-            <p className="text-gray-600 text-lg leading-relaxed mb-8 max-w-xl">
-              {storeBrand.description}
-            </p>
-            <div className="flex flex-col sm:flex-row gap-3">
-              {featured && (
-                <Link
-                  href={`/product/${featured.id}#order-form`}
-                  className="bg-accent hover:bg-primary text-white font-black px-8 py-4 rounded-full text-center transition-colors shadow-sm"
-                >
-                  تسوقي الأكثر مبيعاً
-                </Link>
-              )}
-              <a
-                href="#collections"
-                className="border-2 border-primary/30 text-text font-bold px-8 py-4 rounded-full text-center hover:bg-secondary/50 transition-colors"
-              >
-                استكشفي الكولكسيون
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Trust */}
-      <section className="bg-white border-b border-secondary py-6">
-        <div className="container mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-          {[
-            { icon: '🧵', label: 'قماش كوري أصلي' },
-            { icon: '📏', label: 'مقاسات واضحة + استبدال' },
-            { icon: '🤝', label: 'الدفع عند الاستلام' },
-            { icon: '🚚', label: 'توصيل 58 ولاية' },
-          ].map((item) => (
-            <div key={item.label} className="py-2">
-              <span className="text-2xl block mb-1">{item.icon}</span>
-              <span className="text-xs md:text-sm font-bold text-text">{item.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Collections */}
-      <section id="collections" className="py-14 md:py-16">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-black text-text mb-2">كولكسيون Sitraa</h2>
-            <p className="text-gray-500">اختاري عالمك — حجابات اليوم، وعبايات قريباً</p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {collections.map((col) => {
-              const inner = (
-                <>
-                  {col.comingSoon && (
-                    <span className="absolute top-4 left-4 bg-text/80 text-cream text-xs font-bold px-3 py-1 rounded-full">
-                      قريباً
-                    </span>
-                  )}
-                  <p className="text-xs font-bold text-mocha/70 tracking-widest mb-1">{col.nameEn}</p>
-                  <h3 className="text-2xl font-black text-text mb-2">{col.nameAr}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4">{col.description}</p>
-                  {!col.comingSoon && (
-                    <span className="text-accent font-bold text-sm group-hover:underline">
-                      تسوقي الآن ←
-                    </span>
-                  )}
-                </>
-              );
-              const className = `group relative rounded-2xl border border-secondary overflow-hidden bg-gradient-to-br ${col.accent} p-8 min-h-[220px] flex flex-col justify-end transition-all ${col.comingSoon ? 'opacity-90 cursor-default' : 'hover:shadow-lg'}`;
-
-              return col.comingSoon ? (
-                <div key={col.id} className={className}>
-                  {inner}
-                </div>
-              ) : (
-                <Link key={col.id} href={col.href} className={className}>
-                  {inner}
-                </Link>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* Best sellers */}
-      <section id="bestsellers" className="py-14 bg-white border-y border-secondary">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-10">
-            <div>
-              <h2 className="text-3xl font-black text-text mb-2">الأكثر مبيعاً</h2>
-              <p className="text-gray-500">منتجات Sitraa اللي يثق فيهم زبائننا</p>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {(bestSellers.length > 0 ? bestSellers : products).map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Brand details */}
-      <section className="py-14 md:py-16">
-        <div className="container mx-auto px-4">
-          <div className="bg-primary text-white rounded-3xl p-8 md:p-12 grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            <div>
-              <h2 className="text-2xl md:text-3xl font-black mb-4">علاش Sitraa؟</h2>
-              <p className="text-secondary/90 leading-relaxed mb-6">
-                ما نبيعوش «حجاب أي» — نركز على القماش، الخياطة، المقاس، والتشطيب.
-                جودة تبان من أول لمسة — حتى مامك تقول «هذا صح».
-              </p>
-              <ul className="space-y-3 text-sm">
-                {[
-                  'قماش كوري — بارد وخفيف',
-                  'خياطة مخفية ومتقنة',
-                  'Standard & Maxi — مقاسات واضحة',
-                  'استبدال إذا المقاس ما لبقاش',
-                ].map((line) => (
-                  <li key={line} className="flex gap-2">
-                    <span className="text-accent">✓</span>
-                    <span>{line}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="bg-white/10 rounded-2xl p-6 border border-white/20">
-              <h3 className="font-black text-lg mb-3">📏 المقاس — أهم حاجة</h3>
-              <p className="text-secondary/90 text-sm leading-relaxed mb-4">
-                أكبر خوف: يجي كبير أو صغير. عندنا Standard (180×70) و Maxi (200×80) —
-                واختاري في الطلب، ونتصلو بيك للتأكيد.
-              </p>
-              {featured && (
-                <Link
-                  href={`/product/${featured.id}#order-form`}
-                  className="inline-block bg-white text-primary font-black px-6 py-3 rounded-full hover:bg-cream transition-colors"
-                >
-                  اطلبي مع اختيار المقاس
-                </Link>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
-  );
-}
+import Link from 'next/link';
+import Image from 'next/image';
+import { collections } from '@/data/collections';
+import type { Product } from '@/data/products';
+import ProductCard from '@/components/product/ProductCard';
+import { storeBrand } from '@/lib/store-brand';
+
+type Props = {
+  products: Product[];
+};
+
+export default function BrandHome({ products }: Props) {
+  const bestSellers = products.filter((p) => p.badge?.includes('الأكثر') || (p.rating && p.rating >= 4.8));
+  const featured = products.find((p) => p.id === storeBrand.primaryProductId) ?? products[0];
+
+  return (
+    <div className="bg-cream max-w-lg mx-auto md:max-w-none">
+      {/* Cover + logo */}
+      <section className="relative">
+        <div className="relative w-full aspect-[4/3] overflow-hidden bg-secondary">
+          <Image
+            src={storeBrand.coverSrc}
+            alt={`${storeBrand.nameAr} — اكتشفي عالم الحجابات`}
+            fill
+            className="object-cover object-center"
+            priority
+            sizes="100vw"
+          />
+        </div>
+        <div className="px-4 -mt-10 relative z-10 flex flex-col items-center text-center">
+          <div className="bg-white rounded-2xl p-3 shadow-md border border-secondary mb-4">
+            <Image
+              src={storeBrand.logoSrc}
+              alt={storeBrand.nameAr}
+              width={140}
+              height={140}
+              className="h-24 w-auto object-contain mx-auto"
+              priority
+            />
+          </div>
+          <p className="text-accent font-bold text-xs tracking-widest mb-1">{storeBrand.tagline}</p>
+          <h1 className="text-xl font-black text-text leading-snug mb-2">{storeBrand.taglineAr}</h1>
+          <p className="text-sm text-gray-600 leading-relaxed max-w-sm">
+            {storeBrand.description}
+            <br />
+            {storeBrand.descriptionLine2}
+          </p>
+          <div className="flex flex-col w-full gap-2.5 mt-5 px-2">
+            {featured && (
+              <Link
+                href={`/product/${featured.id}#order-form`}
+                className="w-full bg-accent active:bg-primary text-white font-black py-3.5 rounded-full text-center text-sm shadow-sm"
+              >
+                تسوقي الأكثر مبيعاً
+              </Link>
+            )}
+            <a
+              href="#collections"
+              className="w-full border-2 border-primary/25 text-text font-bold py-3.5 rounded-full text-center text-sm active:bg-secondary/50"
+            >
+              استكشفي الكولكسيون
+            </a>
+          </div>
+        </div>
+      </section>
+
+      {/* Trust */}
+      <section className="mt-8 bg-white border-y border-secondary py-4 mx-0">
+        <div className="grid grid-cols-2 gap-3 px-4 text-center">
+          {[
+            { icon: '🧵', label: 'قماش كوري أصلي' },
+            { icon: '📏', label: 'مقاسات + استبدال' },
+            { icon: '🤝', label: 'الدفع عند الاستلام' },
+            { icon: '🚚', label: '58 ولاية' },
+          ].map((item) => (
+            <div key={item.label} className="py-1.5">
+              <span className="text-xl block mb-0.5">{item.icon}</span>
+              <span className="text-[11px] font-bold text-text leading-tight">{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* Collections */}
+      <section id="collections" className="py-8 px-4">
+        <div className="text-center mb-6">
+          <h2 className="text-xl font-black text-text mb-1">كولكسيون Sitraa</h2>
+          <p className="text-xs text-gray-500">اختاري الموديل اللي يناسبك</p>
+        </div>
+        <div className="space-y-4">
+          {collections.map((col) => {
+            const card = (
+              <article className="bg-white rounded-2xl border border-secondary overflow-hidden shadow-sm">
+                <div className="relative aspect-[16/9] bg-secondary">
+                  <Image
+                    src={col.coverImage}
+                    alt={col.nameAr}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 512px) 100vw, 400px"
+                  />
+                  {col.comingSoon && (
+                    <span className="absolute top-3 left-3 bg-text/85 text-cream text-[10px] font-bold px-2.5 py-1 rounded-full">
+                      قريباً
+                    </span>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                  <div className="absolute bottom-0 right-0 left-0 p-4 text-white">
+                    <p className="text-[10px] font-bold tracking-widest text-white/75">{col.nameEn}</p>
+                    <h3 className="text-lg font-black">{col.nameAr}</h3>
+                  </div>
+                </div>
+                <div className="p-4">
+                  <p className="text-xs text-gray-600 leading-relaxed mb-2">{col.shortDescription}</p>
+                  {!col.comingSoon && (
+                    <span className="text-accent font-bold text-xs">شوفي الموديلات ←</span>
+                  )}
+                </div>
+              </article>
+            );
+
+            return col.comingSoon ? (
+              <div key={col.id}>{card}</div>
+            ) : (
+              <Link key={col.id} href={col.href} className="block active:scale-[0.99] transition-transform">
+                {card}
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Best sellers */}
+      <section id="bestsellers" className="py-8 bg-white border-y border-secondary px-4">
+        <div className="mb-5">
+          <h2 className="text-xl font-black text-text mb-1">الأكثر مبيعاً</h2>
+          <p className="text-xs text-gray-500">منتجات Sitraa اللي يثق فيهم زبائننا</p>
+        </div>
+        <div className="grid grid-cols-2 gap-3">
+          {(bestSellers.length > 0 ? bestSellers : products).map((product) => (
+            <ProductCard key={product.id} product={product} compact />
+          ))}
+        </div>
+      </section>
+
+      {/* About */}
+      <section className="py-8 px-4 pb-12">
+        <div className="bg-primary text-white rounded-2xl p-5">
+          <h2 className="text-lg font-black mb-3">شكون حنا؟</h2>
+          <p className="text-secondary/90 text-sm leading-relaxed mb-4">
+            Sitraa براند جزائري للحجابات — نركز على القماش، الخياطة، والمقاس.
+            <br />
+            جودة تبان من أول لمسة.
+          </p>
+          <ul className="space-y-2 text-xs mb-5">
+            {['قماش كوري — بارد وخفيف', 'مقاس 38–42 و 44–50', 'ألوان الأكثر طلباً', 'استبدال إذا المقاس ما لبقاش'].map(
+              (line) => (
+                <li key={line} className="flex gap-2">
+                  <span className="text-accent">✓</span>
+                  <span>{line}</span>
+                </li>
+              )
+            )}
+          </ul>
+          {featured && (
+            <Link
+              href={`/product/${featured.id}#order-form`}
+              className="block text-center bg-white text-primary font-black py-3 rounded-full text-sm active:bg-cream"
+            >
+              اطلبي الآن
+            </Link>
+          )}
+        </div>
+      </section>
+    </div>
+  );
+}

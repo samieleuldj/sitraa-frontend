@@ -19,8 +19,10 @@ import {
 } from '@/lib/product-discount';
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
+import type { ProductColor } from '@/data/products';
+import { DEFAULT_HIJAB_SIZES } from '@/data/products';
 
-const DEFAULT_SIZES = ['Standard (180×70 cm)', 'Maxi (200×80 cm)'];
+const DEFAULT_SIZES = DEFAULT_HIJAB_SIZES;
 
 const WILAYAS = [
   "01 - أدرار", "02 - الشلف", "03 - الأغواط", "04 - أم البواقي", "05 - باتنة", "06 - بجاية", "07 - بسكرة", "08 - بشار", "09 - البليدة", "10 - البويرة",
@@ -36,7 +38,9 @@ interface CheckoutFormProps {
   productName: string;
   price: number;
   requiresSizeInfo?: boolean;
+  requiresColorInfo?: boolean;
   sizes?: string[];
+  colors?: ProductColor[];
   variant?: 'default' | 'automotive';
 }
 
@@ -45,7 +49,9 @@ export default function CheckoutForm({
   productName,
   price,
   requiresSizeInfo = false,
+  requiresColorInfo = false,
   sizes = DEFAULT_SIZES,
+  colors = [],
   variant = 'default',
 }: CheckoutFormProps) {
   const siteHost = getSiteDisplayUrl();
@@ -69,6 +75,8 @@ export default function CheckoutForm({
   const [deliveryError, setDeliveryError] = useState('');
   const [selectedSize, setSelectedSize] = useState('');
   const [sizeError, setSizeError] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
+  const [colorError, setColorError] = useState('');
   const [communeManual, setCommuneManual] = useState(false);
   const checkoutTracked = useRef(false);
 
@@ -101,16 +109,18 @@ export default function CheckoutForm({
 
   const whatsAppOrderUrl = useMemo(() => {
     const sizeStr = selectedSize;
+    const colorLabel = colors.find((c) => c.id === selectedColor)?.nameAr;
     const lines = [
       `سلام، بغيت نطلب ${productName} (${unitPrice} دج — COD).`,
       sizeStr ? `المقاس: ${sizeStr}` : '',
+      colorLabel ? `اللون: ${colorLabel}` : '',
       wilaya ? `الولاية: ${wilaya}` : '',
       customerName.trim() ? `الاسم: ${customerName.trim()}` : '',
       phone.trim() ? `الهاتف: ${phone.trim()}` : '',
     ].filter(Boolean);
     const text = encodeURIComponent(lines.join('\n'));
     return `${STORE_WHATSAPP_URL}?text=${text}`;
-  }, [selectedSize, wilaya, customerName, phone, productName, unitPrice]);
+  }, [selectedSize, selectedColor, colors, wilaya, customerName, phone, productName, unitPrice]);
 
   const openWhatsAppOrder = () => {
     trackLead({ productId, productName, price: unitPrice, quantity });
@@ -232,6 +242,13 @@ export default function CheckoutForm({
       setSizeError('');
     }
 
+    if (requiresColorInfo && colors.length > 0 && !selectedColor) {
+      setColorError('يرجى اختيار اللون');
+      hasError = true;
+    } else {
+      setColorError('');
+    }
+
     if (hasError) {
       return;
     }
@@ -246,8 +263,12 @@ export default function CheckoutForm({
 
     setIsSubmitting(true);
 
-    const vehicleNote = requiresSizeInfo ? `المقاس: ${selectedSize}` : '';
-    const discountNote = [vehicleNote, exitDiscount > 0 ? `خصم ${exitDiscount} دج (عرض خروج)` : '']
+    const colorLabel = colors.find((c) => c.id === selectedColor)?.nameAr;
+    const optionNotes = [
+      requiresSizeInfo && selectedSize ? `المقاس: ${selectedSize}` : '',
+      requiresColorInfo && colorLabel ? `اللون: ${colorLabel}` : '',
+    ].filter(Boolean);
+    const discountNote = [...optionNotes, exitDiscount > 0 ? `خصم ${exitDiscount} دج (عرض خروج)` : '']
       .filter(Boolean)
       .join(' | ');
 
@@ -375,7 +396,7 @@ export default function CheckoutForm({
               <div>
                 <p className="text-sm font-black text-primary">المقاس *</p>
                 <p className="text-xs mt-1 text-gray-500">
-                  اختار المقاس لي يناسبك باش نوصلولك الحجاب المثالي
+                  38–42 للمقاسات الصغيرة/المتوسطة · 44–50 للمقاسات الكبيرة
                 </p>
               </div>
             </div>
@@ -404,6 +425,42 @@ export default function CheckoutForm({
             </div>
             
             {sizeError && <p className="text-red-500 text-xs mt-1 font-bold text-center">{sizeError}</p>}
+          </div>
+        )}
+
+        {requiresColorInfo && colors.length > 0 && (
+          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-3">
+            <div className="flex items-start gap-3">
+              <span className="text-2xl">🎨</span>
+              <div>
+                <p className="text-sm font-black text-primary">اللون *</p>
+                <p className="text-xs mt-1 text-gray-500">الألوان الأكثر طلباً عند زبائن Sitraa</p>
+              </div>
+            </div>
+            <div className="grid grid-cols-3 gap-2">
+              {colors.map((color) => (
+                <button
+                  key={color.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedColor(color.id);
+                    setColorError('');
+                  }}
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
+                    selectedColor === color.id
+                      ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  <span
+                    className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
+                    style={{ backgroundColor: color.hex }}
+                  />
+                  <span className="text-[10px] font-bold text-text">{color.nameAr}</span>
+                </button>
+              ))}
+            </div>
+            {colorError && <p className="text-red-500 text-xs font-bold text-center">{colorError}</p>}
           </div>
         )}
 

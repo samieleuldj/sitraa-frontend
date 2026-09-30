@@ -1,4 +1,6 @@
 import type { MetadataRoute } from 'next';
+import { collections } from '@/data/collections';
+import { products } from '@/data/products';
 import { getSiteUrl } from '@/lib/seo';
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -12,11 +14,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: 'daily',
       priority: 1,
     },
-    {
-      url: `${siteUrl}/product/hood-insulation-mat`,
+    ...collections
+      .filter((c) => !c.comingSoon)
+      .map((collection) => ({
+        url: `${siteUrl}${collection.href}`,
+        lastModified: now,
+        changeFrequency: 'weekly' as const,
+        priority: 0.85,
+      })),
+    ...products.map((product) => ({
+      url: `${siteUrl}/product/${product.id}`,
       lastModified: now,
-      changeFrequency: 'weekly',
+      changeFrequency: 'weekly' as const,
       priority: 0.9,
-    },
+    })),
   ];
 }

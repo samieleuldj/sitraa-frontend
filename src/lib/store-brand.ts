@@ -1,20 +1,23 @@
-export const storeBrand = {
-  name: 'Sitraa',
-  nameAr: 'سِتْرة',
-  tagline: 'SOFT MODEST FASHION',
-  taglineAr: 'حجابات بجودة تليق بيك',
-  description:
-    'متجر جزائري للحجابات — قماش فاخر، خياطة متقنة، ومقاسات مدروسة. الدفع عند الاستلام والتوصيل لـ 58 ولاية.',
-  email: '',
-  accentClass: 'text-accent',
-  primaryProductId: 'hijab-classic',
-};
-
-export function getSiteDisplayUrl(): string {
-  const url = process.env.NEXT_PUBLIC_SITE_URL || 'https://sitraa.shop';
-  try {
-    return new URL(url).hostname;
-  } catch {
-    return 'sitraa.shop';
-  }
-}
+export const storeBrand = {
+  name: 'Sitraa',
+  nameAr: 'سِتْرة',
+  tagline: 'HIJAB & SCARVES',
+  taglineAr: 'أناقتك … بطريقتك',
+  description:
+    'متجر جزائري للحجابات — قماش فاخر، خياطة متقنة، ومقاسات مدروسة.',
+  descriptionLine2: 'الدفع عند الاستلام · توصيل 58 ولاية.',
+  logoSrc: '/brand/sitraa-logo.png',
+  coverSrc: '/brand/sitraa-cover.png',
+  email: '',
+  accentClass: 'text-accent',
+  primaryProductId: 'hijab-classic',
+};
+
+export function getSiteDisplayUrl(): string {
+  const url = process.env.NEXT_PUBLIC_SITE_URL || 'https://sitraa.shop';
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return 'sitraa.shop';
+  }
+}

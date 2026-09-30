@@ -1,9 +1,13 @@
+export type CollectionId = 'hijabs' | 'sharia-hijabs' | 'abayas';
+
 export type Collection = {
-  id: string;
+  id: CollectionId;
   nameAr: string;
   nameEn: string;
   description: string;
+  shortDescription: string;
   href: string;
+  coverImage: string;
   comingSoon?: boolean;
   accent: string;
 };
@@ -14,7 +18,9 @@ export const collections: Collection[] = [
     nameAr: 'حجابات',
     nameEn: 'Hijabs',
     description: 'حجابات يومية — قماش ناعم، ثبات ممتاز، ومقاسات واضحة.',
-    href: '/product/hijab-classic',
+    shortDescription: 'ستايلات يومية — كلاسيك، فولار، وألوان ترند',
+    href: '/collection/hijabs',
+    coverImage: '/brand/sitraa-cover.png',
     accent: 'from-secondary to-cream',
   },
   {
@@ -22,7 +28,9 @@ export const collections: Collection[] = [
     nameAr: 'حجابات شرعية',
     nameEn: 'Modest Hijabs',
     description: 'تغطية كاملة، خامات محتشمة، وتشطيب يليق باللباس الشرعي.',
-    href: '/product/hijab-classic',
+    shortDescription: 'تغطية كاملة — سترة، شرشف، وموديلات محتشمة',
+    href: '/collection/sharia-hijabs',
+    coverImage: '/brand/sitraa-cover.png',
     accent: 'from-nude/80 to-secondary',
   },
   {
@@ -30,7 +38,9 @@ export const collections: Collection[] = [
     nameAr: 'عبايات',
     nameEn: 'Abayas',
     description: 'قريباً — عبايات أنيقة بخياطة متقنة من Sitraa.',
-    href: '#collections',
+    shortDescription: 'عبايات أنيقة — قريباً في المتجر',
+    href: '/collection/abayas',
+    coverImage: '/brand/sitraa-cover.png',
     comingSoon: true,
     accent: 'from-primary/20 to-secondary',
   },
