@@ -18,12 +18,9 @@ import {
   getStoredDiscount,
 } from '@/lib/product-discount';
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
-import CarBrandPicker from '@/components/checkout/CarBrandPicker';
-import {
-  formatVehicleSelection,
-  getModelsForBrand,
-} from '@/data/car-brands';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
+
+const DEFAULT_SIZES = ['Standard (180×70 cm)', 'Maxi (200×80 cm)'];
 
 const WILAYAS = [
   "01 - أدرار", "02 - الشلف", "03 - الأغواط", "04 - أم البواقي", "05 - باتنة", "06 - بجاية", "07 - بسكرة", "08 - بشار", "09 - البليدة", "10 - البويرة",
@@ -39,9 +36,8 @@ interface CheckoutFormProps {
   productName: string;
   price: number;
   requiresSizeInfo?: boolean;
+  sizes?: string[];
   variant?: 'default' | 'automotive';
-  initialBrandId?: string;
-  initialModelId?: string;
 }
 
 export default function CheckoutForm({
@@ -49,9 +45,8 @@ export default function CheckoutForm({
   productName,
   price,
   requiresSizeInfo = false,
+  sizes = DEFAULT_SIZES,
   variant = 'default',
-  initialBrandId = '',
-  initialModelId = '',
 }: CheckoutFormProps) {
   const siteHost = getSiteDisplayUrl();
   const isAutomotive = false;
@@ -75,7 +70,6 @@ export default function CheckoutForm({
   const [selectedSize, setSelectedSize] = useState('');
   const [sizeError, setSizeError] = useState('');
   const [communeManual, setCommuneManual] = useState(false);
-  const carModels = getModelsForBrand(carBrandId);
   const checkoutTracked = useRef(false);
 
   const shippingRate = useMemo(() => getShippingRate(wilaya), [wilaya]);
@@ -131,11 +125,6 @@ export default function CheckoutForm({
   useEffect(() => {
     setLivePrice(price);
   }, [price]);
-
-  useEffect(() => {
-    if (initialBrandId) setCarBrandId(initialBrandId);
-    if (initialModelId) setCarModelId(initialModelId);
-  }, [initialBrandId, initialModelId]);
 
   useEffect(() => {
     setExitDiscount(getStoredDiscount(productId));
@@ -392,7 +381,7 @@ export default function CheckoutForm({
             </div>
             
             <div className="grid grid-cols-1 gap-3">
-              {['Standard (180x70 cm)', 'Maxi (200x80 cm)'].map((sizeOption) => (
+              {sizes.map((sizeOption) => (
                 <button
                   key={sizeOption}
                   type="button"

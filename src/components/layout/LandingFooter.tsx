@@ -3,22 +3,23 @@ import { storeBrand } from '@/lib/store-brand';
 
 export default function LandingFooter() {
   return (
-    <footer className="bg-zinc-950 border-t border-zinc-800 text-zinc-400 py-8">
+    <footer className="bg-text border-t border-mocha/20 text-nude py-10">
       <div className="container mx-auto px-4 text-center space-y-3">
-        <p className="text-white font-black">
-          AUTO <span className="text-amber-400">PLUS</span> DZ
+        <p className="text-cream font-black text-lg">
+          {storeBrand.nameAr}
+          <span className="text-accent">.</span>
         </p>
-        <p className="text-sm">توصيل 58 ولاية — الدفع عند الاستلام</p>
+        <p className="text-sm text-nude/80">توصيل 58 ولاية — الدفع عند الاستلام — استبدال المقاس</p>
         <a
           href={STORE_WHATSAPP_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-block text-amber-400 hover:text-amber-300 font-bold"
+          className="inline-block text-accent hover:text-secondary font-bold transition-colors"
           dir="ltr"
         >
           {STORE_PHONE_DISPLAY}
         </a>
-        <p className="text-xs text-zinc-600 pt-2">
+        <p className="text-xs text-nude/50 pt-2">
           © {new Date().getFullYear()} {storeBrand.nameAr}. جميع الحقوق محفوظة.
         </p>
       </div>

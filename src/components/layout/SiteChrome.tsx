@@ -3,7 +3,7 @@
 import LandingHeader from '@/components/layout/LandingHeader';
 import LandingFooter from '@/components/layout/LandingFooter';
 
-/** Single-product landing (AUTO PLUS / موكات) — no Confort store navigation. */
+/** Sitraa single-product landing — no store navigation. */
 export default function SiteChrome({ children }: { children: React.ReactNode }) {
   return (
     <>

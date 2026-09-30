@@ -17,14 +17,12 @@ export type Product = {
   features: string[];
   fabricInfo?: string;
   careInstructions?: string;
+  weightG?: number;
+  stitchNote?: string;
   sizes?: string[];
   images?: string[];
-  beforeImage?: string;
-  afterImage?: string;
   problemText?: string;
   solutionText?: string;
-  usageSteps?: string[];
-  usageTitle?: string;
   videoFile?: string;
   videoPoster?: string;
   rating?: number;
@@ -38,27 +36,30 @@ export const products: Product[] = [
     id: 'hijab-classic',
     name: 'حجاب كلاسيك بريميوم — Sitraa',
     description:
-      'حجاب مصمم خصيصاً للمرأة الجزائرية. قماش حريري بارد ما يزلقش، خياطة مخفية ومتقنة تعكس احترافية البراند. القياس مدروس ليغطي الأكتاف براحة تامة.',
+      'حجاب مصمم للمرأة الجزائرية — قماش كوري أصلي، خياطة متقنة، ومقاسات واضحة. جودة تبان من أول لمسة.',
     price: 2500,
     oldPrice: 3500,
     badge: 'الأكثر مبيعاً ✨',
     rating: 4.9,
     reviewCount: 124,
     requiresSizeInfo: true,
-    sizes: ['Standard (180x70 cm)', 'Maxi (200x80 cm)'],
-    fabricInfo: 'قماش كريب جورجيت كوري أصلي — بارد، خفيف، ولا يحتاج للكي باستمرار.',
-    careInstructions: 'يُغسل يدوياً أو في الغسالة بدرجة حرارة منخفضة (30°C).',
+    sizes: ['Standard (180×70 cm)', 'Maxi (200×80 cm)'],
+    fabricInfo:
+      'قماش كريب جورجيت كوري أصلي — بارد، خفيف، مسامات تتنفس. ما يزلقش ولا يحتاج كي باستمرار.',
+    careInstructions: 'غسل يدوي أو غسالة 30°C — تجفيف طبيعي.',
+    weightG: 180,
+    stitchNote: 'خياطة مخفية عند الحواف — finishing نظيف',
     features: [
-      'قماش كوري أصلي: بارد ومسامات تتنفس طوال اليوم',
-      'فولار ثابت: ما يسلّكش وما يزلقش بسهولة',
-      'خياطة احترافية مخفية عند الأطراف',
-      'مقاسات مضبوطة لتغطية كاملة ومريحة',
-      'ضمان استبدال: إذا ما عجباتكش الكاليتي نبدلوهالك'
+      'قماش كوري أصلي — بارد ومسامات تتنفس',
+      'فولار ثابت — ما يسلّكش بسهولة',
+      'خياطة احترافية مخفية',
+      'مقاسات Standard و Maxi — واضحة ومضبوطة',
+      'استبدال ساهل إذا المقاس ما لبقاش',
     ],
     problemText:
-      'تعبتي من الحجابات اللي قماشها يزلق، تخنق في الصيف، أو خياطتها تبان رخيصة وتتنسل بالخف؟ يخسرو مور غسلة ولا زوج؟',
+      'حجاب يزلق، يخنق في الصيف، خياطة تبان رخيصة، أو مقاس ما يبانش online — وتندمي بعد ما تشري.',
     solutionText:
-      'حجاب Sitraa يجمع بين الفخامة والراحة. قماش كوري أصلي يخليك تحسي بالبرودة، مع فينيسيو (Finishing) متقنة تخلي حجابك يبان غالي ومميز.',
+      'Sitraa: قماش فاخر، finishing متقن، مقاسات واضحة + استبدال. جودة تبان — حتى مامك تقول "هذا صح".',
     reviews: [],
   },
 ];

@@ -1,12 +1,12 @@
 export const storeBrand = {
   name: 'Sitraa',
   nameAr: 'سِتْرة',
-  tagline: 'MODEST FASHION',
-  taglineAr: 'حجابات وأناقة محتشمة',
+  tagline: 'SOFT MODEST FASHION',
+  taglineAr: 'حجابات بجودة تليق بيك',
   description:
-    'متجر جزائري للحجابات — جودة، راحة، وأناقة. الدفع عند الاستلام والتوصيل لـ 58 ولاية.',
+    'متجر جزائري للحجابات — قماش فاخر، خياطة متقنة، ومقاسات مدروسة. الدفع عند الاستلام والتوصيل لـ 58 ولاية.',
   email: '',
-  accentClass: 'text-rose-400',
+  accentClass: 'text-accent',
   primaryProductId: 'hijab-classic',
 };
 
