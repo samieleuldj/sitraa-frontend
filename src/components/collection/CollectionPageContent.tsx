@@ -11,19 +11,21 @@ type Props = {
 
 export default function CollectionPageContent({ collection, products }: Props) {
   return (
-    <div className="bg-cream min-h-screen pb-10">
-      <div className="relative w-full aspect-[16/10] max-h-[280px] overflow-hidden bg-secondary">
+    <div className="bg-cream min-h-screen pb-10 max-w-lg mx-auto">
+      <div className="relative w-full aspect-[4/5] max-h-[420px] overflow-hidden bg-secondary">
         <Image
           src={collection.coverImage}
           alt={collection.nameAr}
           fill
-          className="object-cover object-center"
+          className={`object-cover ${collection.coverPosition ?? 'object-center'}`}
           priority
           sizes="100vw"
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
         <div className="absolute bottom-0 right-0 left-0 p-4 text-white">
-          <p className="text-[10px] font-bold tracking-widest text-white/80 mb-1">{collection.nameEn}</p>
+          <p className="text-[10px] font-bold tracking-[0.2em] text-white/80 uppercase mb-1">
+            {collection.nameEn}
+          </p>
           <h1 className="text-2xl font-black">{collection.nameAr}</h1>
           <p className="text-sm text-white/90 mt-1">{collection.shortDescription}</p>
         </div>
