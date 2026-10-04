@@ -162,8 +162,8 @@ export const products: Product[] = [
     name: 'طقم العفة — Sitraa',
     description:
       'طقم شرعي كامل 4 قطع: عباية + وشاح الغشوة + نقاب + قفازات. خامة كريب مطاطي — تغطية كاملة بدون شفافية، وألوان متناسقة من طقم واحد.',
-    price: 9500,
-    oldPrice: 12000,
+    price: 5900,
+    oldPrice: 7900,
     badge: 'الأكثر طلباً ✨',
     rating: 4.9,
     reviewCount: 62,
@@ -206,6 +206,11 @@ export const products: Product[] = [
       'تشري قطعة قطعة واللون ما يطابقش، أو القماش شفاف، أو النقاب يضايق، أو المقاس يجي غلط online — وتندمي.',
     solutionText:
       'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
+    finishingImages: [
+      { src: '/products/taqm-al-iffa/black-2.png', label: 'وشاح متعدد الطبقات' },
+      { src: '/products/taqm-al-iffa/navy.png', label: 'التغطية الكاملة — أزرق' },
+      { src: '/products/taqm-al-iffa/black-1.png', label: 'الأكمام المطاطية' },
+    ],
     reviews: [],
   },
   {
