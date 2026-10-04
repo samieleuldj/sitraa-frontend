@@ -122,6 +122,69 @@ export const products: Product[] = [
     reviews: [],
   },
   {
+    id: 'ensemble-elegance-sitraa',
+    collectionId: 'hijabs',
+    productKind: 'abaya',
+    name: 'طقم أناقة قطعتين — Sitraa',
+    description:
+      'طقم محتشم من قطعتين: بلوزة بأكمام balloon + تنورة واسعة بكسرات. خامة ناعمة، سقوط أنيق، وستايل عصري للخروج اليومي والمناسبات.',
+    price: 3900,
+    oldPrice: 5500,
+    badge: 'جديد ✨',
+    rating: 4.9,
+    reviewCount: 41,
+    requiresSizeInfo: true,
+    requiresColorInfo: true,
+    sizes: DEFAULT_SIZES,
+    colors: [
+      {
+        id: 'blue',
+        nameAr: 'أزرق',
+        hex: '#1e4d6b',
+        image: '/products/ensemble-two-piece/blue.png',
+      },
+      {
+        id: 'black',
+        nameAr: 'أسود',
+        hex: '#1a1a1a',
+        image: '/products/ensemble-two-piece/black.png',
+      },
+      {
+        id: 'beige',
+        nameAr: 'بيج',
+        hex: '#c9b59a',
+        image: '/products/ensemble-two-piece/beige.png',
+      },
+    ],
+    images: [
+      '/products/ensemble-two-piece/blue.png',
+      '/products/ensemble-two-piece/black.png',
+      '/products/ensemble-two-piece/beige.png',
+    ],
+    fabricInfo:
+      'كريب ناعم — خفيف، ما يتكشّرش، وما يلبسش الجسم. سقوط wide يعطي راحة ومحتشمة في نفس الوقت.',
+    careInstructions: 'غسل يدوي أو غسالة 30°C — تجفيف طبيعي.',
+    stitchNote: 'أكمام مطاطية + رباطات — ستايل balloon أنيق',
+    features: [
+      'قطعتين متناسقتين — بلوزة + تنورة',
+      'أكمام balloon برباطات عند المعصم',
+      'تنورة واسعة بكسرات — راحة وحركة',
+      '3 ألوان: أزرق، أسود، بيج',
+      'مقاس 38–42 و 44–50',
+      'مناسب للجامعة، الخروج، والمناسبات',
+    ],
+    problemText:
+      'لبسة ضيقة، قماش رقيق، أو ستايل قديم — وتحسي ما تبانش أنيقة ولا مرتاحة.',
+    solutionText:
+      'Sitraa: طقم قطعتين بقماش ناعم، ستايل عصري، وألوان ترند. محتشمة وفي نفس الوقت أنيقة — تلبسيها بثقة.',
+    finishingImages: [
+      { src: '/products/ensemble-two-piece/blue.png', label: 'أكمام balloon + رباطات' },
+      { src: '/products/ensemble-two-piece/beige.png', label: 'تنورة واسعة بكسرات' },
+      { src: '/products/ensemble-two-piece/black.png', label: 'ستايل كامل — أسود' },
+    ],
+    reviews: [],
+  },
+  {
     id: 'hijab-classic',
     collectionId: 'hijabs',
     productKind: 'hijab',

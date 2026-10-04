@@ -38,6 +38,10 @@ export const productUpsells: Record<string, ProductUpsellConfig> = {
     },
     exitOffer: { type: 'bundle' },
   },
+  'ensemble-elegance-sitraa': {
+    secondUnitDiscount: 500,
+    exitOffer: { type: 'discount', discountAmount: 300 },
+  },
   'hijab-classic': {
     secondUnitDiscount: 500,
     exitOffer: { type: 'discount', discountAmount: 200 },
