@@ -20,7 +20,7 @@ import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
 import CheckoutUpsellOffers from '@/components/checkout/CheckoutUpsellOffers';
 import type { ProductColor } from '@/data/products';
-import { DEFAULT_SIZE_VALUES, SIZE_OPTIONS } from '@/data/sizes';
+import { DEFAULT_SIZE_VALUES, SIZE_OPTIONS, type SizeOption } from '@/data/sizes';
 import { bundlePrefKey, getUpsellForProduct } from '@/data/upsells';
 
 function calcProductSubtotal(
@@ -54,6 +54,7 @@ interface CheckoutFormProps {
   requiresColorInfo?: boolean;
   sizes?: string[];
   colors?: ProductColor[];
+  sizeOptions?: SizeOption[];
   variant?: 'default' | 'automotive';
 }
 
@@ -65,8 +66,10 @@ export default function CheckoutForm({
   requiresColorInfo = false,
   sizes = DEFAULT_SIZES,
   colors = [],
+  sizeOptions,
   variant = 'default',
 }: CheckoutFormProps) {
+  const formSizeOptions = sizeOptions ?? SIZE_OPTIONS.filter((opt) => sizes.includes(opt.value));
   const siteHost = getSiteDisplayUrl();
   const isAutomotive = false;
   const [livePrice, setLivePrice] = useState(price);
@@ -446,8 +449,8 @@ export default function CheckoutForm({
         {requiresSizeInfo && (
           <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
             <p className="text-xs font-black text-primary">المقاس *</p>
-            <div className="grid grid-cols-2 gap-2">
-              {SIZE_OPTIONS.filter((opt) => sizes.includes(opt.value)).map((opt) => (
+            <div className={`grid gap-2 ${formSizeOptions.length > 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
+              {formSizeOptions.map((opt) => (
                 <button
                   key={opt.value}
                   type="button"

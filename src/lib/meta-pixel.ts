@@ -12,6 +12,8 @@ const PIXEL_BY_PRODUCT: Record<string, string | undefined> = {
     process.env.NEXT_PUBLIC_META_PIXEL_HIJAB_CLASSIC || SITRAA_PIXEL_ID,
   'hijab-sharia-sitraa':
     process.env.NEXT_PUBLIC_META_PIXEL_SHARIA || SITRAA_PIXEL_ID,
+  'taqm-al-iffa-sitraa':
+    process.env.NEXT_PUBLIC_META_PIXEL_SHARIA || SITRAA_PIXEL_ID,
 };
 
 export function getDefaultMetaPixelId(): string {

@@ -3,7 +3,7 @@ type Props = {
   careInstructions?: string;
   weightG?: number;
   stitchNote?: string;
-  productKind?: 'hijab' | 'abaya';
+  productKind?: 'hijab' | 'abaya' | 'sharia-set';
 };
 
 const HIJAB_DETAILS = [
@@ -15,9 +15,16 @@ const HIJAB_DETAILS = [
 
 const ABAYA_DETAILS = [
   { icon: '👗', title: 'الطقم', desc: 'قطعتين — فستان + درّاعة مفتوحة منسقين' },
-  { icon: '✨', title: 'الستايل', desc: 'أكمام واسعة — look عصري وأنيق' },
+  { icon: '✨', title: 'الستايل', desc: 'أكمام واسعة — ستايل عصري وأنيق' },
   { icon: '🧵', title: 'الخياطة', desc: 'تشطيب متقن — جودة تبان من أول لمسة' },
   { icon: '🌸', title: 'المناسبة', desc: 'للخروج اليومي والمناسبات والأعراس' },
+];
+
+const SHARIA_SET_DETAILS = [
+  { icon: '🧕', title: '4 قطع', desc: 'عباية + غشوة + نقاب + قفازات — نفس اللون' },
+  { icon: '🛡️', title: 'تغطية', desc: 'opaque — ما يبانش تحتيه، محتشم 100%' },
+  { icon: '🧵', title: 'الأكمام', desc: 'مطاطية عند المعصم — سهلة للوضوء' },
+  { icon: '💬', title: 'التأكيد', desc: 'نتصلو بيك قبل الإرسال — المقاس واللون' },
 ];
 
 export default function HijabCraftDetails({
@@ -27,7 +34,12 @@ export default function HijabCraftDetails({
   stitchNote,
   productKind = 'hijab',
 }: Props) {
-  const details = productKind === 'abaya' ? ABAYA_DETAILS : HIJAB_DETAILS;
+  const details =
+    productKind === 'sharia-set'
+      ? SHARIA_SET_DETAILS
+      : productKind === 'abaya'
+        ? ABAYA_DETAILS
+        : HIJAB_DETAILS;
 
   return (
     <section className="space-y-6">

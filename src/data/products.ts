@@ -1,4 +1,9 @@
-import { DEFAULT_SIZE_VALUES } from '@/data/sizes';
+import {
+  DEFAULT_SIZE_VALUES,
+  TAQM_AL_IFFA_SIZE_OPTIONS,
+  TAQM_AL_IFFA_SIZE_VALUES,
+  type SizeOption,
+} from '@/data/sizes';
 
 export type ProductReview = {
   name: string;
@@ -41,7 +46,8 @@ export type Product = {
   reviews?: ProductReview[];
   requiresSizeInfo?: boolean;
   requiresColorInfo?: boolean;
-  productKind?: 'hijab' | 'abaya';
+  productKind?: 'hijab' | 'abaya' | 'sharia-set';
+  sizeOptions?: SizeOption[];
   finishingImages?: { src: string; label: string }[];
 };
 
@@ -147,6 +153,59 @@ export const products: Product[] = [
       'حجاب يزلق، يخنق في الصيف، خياطة تبان رخيصة، أو مقاس ما يبانش online — وتندمي بعد ما تشري.',
     solutionText:
       'Sitraa: قماش فاخر، تشطيب متقن، مقاسات واضحة + استبدال. جودة تبان — حتى مامك تقول "هذا صح".',
+    reviews: [],
+  },
+  {
+    id: 'taqm-al-iffa-sitraa',
+    collectionId: 'sharia-hijabs',
+    productKind: 'sharia-set',
+    name: 'طقم العفة — Sitraa',
+    description:
+      'طقم شرعي كامل 4 قطع: عباية + وشاح الغشوة + نقاب + قفازات. خامة كريب مطاطي — تغطية كاملة بدون شفافية، وألوان متناسقة من طقم واحد.',
+    price: 9500,
+    oldPrice: 12000,
+    badge: 'الأكثر طلباً ✨',
+    rating: 4.9,
+    reviewCount: 62,
+    requiresSizeInfo: true,
+    requiresColorInfo: true,
+    sizes: TAQM_AL_IFFA_SIZE_VALUES,
+    sizeOptions: TAQM_AL_IFFA_SIZE_OPTIONS,
+    colors: [
+      {
+        id: 'navy',
+        nameAr: 'أزرق',
+        hex: '#1e3a5f',
+        image: '/products/taqm-al-iffa/navy.png',
+      },
+      {
+        id: 'black',
+        nameAr: 'أسود',
+        hex: '#1a1a1a',
+        image: '/products/taqm-al-iffa/black-1.png',
+      },
+    ],
+    images: [
+      '/products/taqm-al-iffa/navy.png',
+      '/products/taqm-al-iffa/black-1.png',
+      '/products/taqm-al-iffa/black-2.png',
+    ],
+    fabricInfo:
+      'كريب مطاطي فاخر — opaque 100%، ما يبانش تحتيه، وخفيف في نفس الوقت. مناسب للصيف والشتاء.',
+    careInstructions: 'غسل يدوي أو غسالة 30°C — تجفيف طبيعي — ما تكيّيش بحرارة عالية.',
+    stitchNote: 'أكمام مطاطية عند المعصم — سهلة للوضوء وما تنزلش',
+    features: [
+      '4 قطع متناسقة — عباية + غشوة + نقاب + قفازات',
+      'تغطية كاملة — بدون شفافية',
+      'غشوة طويلة بطبقات — ما تتحركش بسهولة',
+      '3 مقاسات: 38–42 · 44–48 · 50–56',
+      'لونين: أزرق وأسود',
+      'نتصلو بيك للتأكيد قبل الإرسال',
+    ],
+    problemText:
+      'تشري قطعة قطعة واللون ما يطابقش، أو القماش شفاف، أو النقاب يضايق، أو المقاس يجي غلط online — وتندمي.',
+    solutionText:
+      'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
     reviews: [],
   },
   {

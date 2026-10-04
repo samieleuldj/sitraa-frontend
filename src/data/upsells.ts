@@ -46,6 +46,10 @@ export const productUpsells: Record<string, ProductUpsellConfig> = {
     secondUnitDiscount: 500,
     exitOffer: { type: 'discount', discountAmount: 200 },
   },
+  'taqm-al-iffa-sitraa': {
+    secondUnitDiscount: 800,
+    exitOffer: { type: 'discount', discountAmount: 500 },
+  },
 };
 
 export function getUpsellForProduct(productId: string): ProductUpsellConfig | undefined {

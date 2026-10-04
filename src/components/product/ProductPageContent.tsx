@@ -28,7 +28,10 @@ export default function ProductPageContent({
   hideBreadcrumb = false,
 }: Props) {
   const collection = getCollectionForProduct(product);
-  const isAbaya = product.productKind === 'abaya' || product.collectionId === 'abayas';
+  const isAbaya =
+    product.productKind === 'abaya' ||
+    product.productKind === 'sharia-set' ||
+    product.collectionId === 'abayas';
   const upsellConfig = getUpsellForProduct(product.id);
 
   return (
@@ -113,6 +116,7 @@ export default function ProductPageContent({
             requiresSizeInfo={product.requiresSizeInfo}
             requiresColorInfo={product.requiresColorInfo}
             sizes={product.sizes}
+            sizeOptions={product.sizeOptions}
             colors={product.colors}
           />
           <ConversionTrustBar />
@@ -126,7 +130,7 @@ export default function ProductPageContent({
           productKind={isAbaya ? 'abaya' : 'hijab'}
         />
 
-        <HijabSizeGuide />
+        <HijabSizeGuide sizeOptions={product.sizeOptions} />
 
         <ProductFinishingGallery shots={product.finishingImages} />
 
