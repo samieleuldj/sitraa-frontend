@@ -79,7 +79,28 @@ export default function ProductPageContent({
               {product.badge}
             </span>
           )}
-          <h1 className="text-xl font-black text-text mb-2 leading-tight">{product.name}</h1>
+          <h1 className="text-2xl font-black text-text mb-2 leading-tight">{product.name}</h1>
+          {product.productKind === 'sharia-set' && (
+            <div className="mb-3 p-3 rounded-xl bg-primary/5 border border-primary/15">
+              <p className="text-sm font-black text-primary mb-2">🎁 الطقم كامل — 4 قطع</p>
+              <div className="grid grid-cols-4 gap-1.5 text-center">
+                {[
+                  { icon: '👗', label: 'عباية' },
+                  { icon: '🧣', label: 'غشوة' },
+                  { icon: '😷', label: 'نقاب' },
+                  { icon: '🧤', label: 'قفازات' },
+                ].map((piece) => (
+                  <div
+                    key={piece.label}
+                    className="bg-white rounded-lg py-1.5 px-1 border border-secondary"
+                  >
+                    <span className="text-base block">{piece.icon}</span>
+                    <span className="text-[9px] font-bold text-text">{piece.label}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
           <p className="text-gray-600 text-sm mb-4 leading-relaxed">{product.description}</p>
           <ProductPriceDisplay
             productId={product.id}
@@ -134,7 +155,9 @@ export default function ProductPageContent({
 
         <HijabSizeGuide sizeOptions={product.sizeOptions} />
 
-        <ProductFinishingGallery shots={product.finishingImages} />
+        {product.finishingImages && product.finishingImages.length > 0 && (
+          <ProductFinishingGallery shots={product.finishingImages} />
+        )}
 
         {product.videoFile ? (
           <section className="bg-white p-5 rounded-2xl border border-secondary">

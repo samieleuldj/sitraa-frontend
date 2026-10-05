@@ -260,10 +260,6 @@ export const products: Product[] = [
       'تشري قطعة قطعة واللون ما يطابقش، أو القماش شفاف، أو النقاب يضايق، أو المقاس يجي غلط online — وتندمي.',
     solutionText:
       'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
-    finishingImages: [
-      { src: '/products/taqm-al-iffa/navy.webp', label: 'طقم العفة — أزرق' },
-      { src: '/products/taqm-al-iffa/black.webp', label: 'طقم العفة — أسود' },
-    ],
     reviews: [],
   },
   {

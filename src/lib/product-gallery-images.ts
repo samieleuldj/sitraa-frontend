@@ -18,17 +18,14 @@ export function buildProductGallerySlides(product: Product): GallerySlide[] {
   };
 
   (product.images ?? []).forEach((src, index) => {
-    push(src, `${product.name} — صورة ${index + 1}`);
-  });
-
-  product.colors?.forEach((color) => {
-    if (color.image) {
-      push(color.image, `${product.name} — ${color.nameAr}`, color.nameAr);
-    }
-  });
-
-  product.finishingImages?.forEach((shot) => {
-    push(shot.src, `${product.name} — ${shot.label}`, shot.label);
+    const colorMatch = product.colors?.find((c) => c.image === src);
+    push(
+      src,
+      colorMatch
+        ? `${product.name} — ${colorMatch.nameAr}`
+        : `${product.name} — صورة ${index + 1}`,
+      colorMatch?.nameAr,
+    );
   });
 
   return slides;

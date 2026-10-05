@@ -40,11 +40,11 @@ export default function ProductGallery({ slides, productName }: ProductGalleryPr
 
   return (
     <>
-      <div className="space-y-3" dir="rtl">
+      <div className="space-y-3 max-w-[300px] mx-auto" dir="rtl">
         <button
           type="button"
           onClick={() => setZoomOpen(true)}
-          className="relative w-full aspect-[4/5] bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm group text-right"
+          className="relative w-full aspect-[3/4] max-h-[360px] bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-sm group text-right"
           aria-label="تكبير الصورة"
         >
           <Image
