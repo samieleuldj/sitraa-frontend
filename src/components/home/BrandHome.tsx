@@ -18,7 +18,7 @@ const TRUST_ITEMS = [
 ];
 
 export default function BrandHome({ products }: Props) {
-  const bestSellers = products.filter((p) => p.badge?.includes('الأكثر') || (p.rating && p.rating >= 4.8));
+  const bestSellers = products.filter((p) => p.badge?.includes('الأكثر') || p.badge?.includes('جديد'));
   const featured = products.find((p) => p.id === storeBrand.primaryProductId) ?? products[0];
 
   return (

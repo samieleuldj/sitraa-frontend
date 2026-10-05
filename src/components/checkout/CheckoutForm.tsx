@@ -19,9 +19,20 @@ import {
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
 import CheckoutUpsellOffers from '@/components/checkout/CheckoutUpsellOffers';
+import CheckoutProgressBar from '@/components/checkout/CheckoutProgressBar';
 import type { ProductColor } from '@/data/products';
 import { DEFAULT_SIZE_VALUES, SIZE_OPTIONS, type SizeOption } from '@/data/sizes';
 import { bundlePrefKey, getUpsellForProduct } from '@/data/upsells';
+import {
+  clearCheckoutDraft,
+  loadCheckoutDraft,
+  saveCheckoutDraft,
+} from '@/lib/checkout-storage';
+import {
+  getPhoneValidationMessage,
+  isValidAlgerianPhone,
+  normalizePhoneInput,
+} from '@/lib/phone-validation';
 
 function calcProductSubtotal(
   unitPrice: number,
@@ -97,7 +108,12 @@ export default function CheckoutForm({
   const [addBundle, setAddBundle] = useState(false);
   const [secondUnitPromo, setSecondUnitPromo] = useState(false);
   const checkoutTracked = useRef(false);
+  const abandonTracked = useRef(false);
+  const lastFieldRef = useRef('none');
   const upsellConfig = getUpsellForProduct(productId);
+  const hasColorStep = requiresColorInfo && colors.length > 0;
+  const totalSteps = hasColorStep ? 2 : 1;
+  const [step, setStep] = useState(hasColorStep ? 1 : 1);
 
   const shippingRate = useMemo(() => getShippingRate(wilaya), [wilaya]);
   const communes = useMemo(() => getCommunesForWilaya(wilaya), [wilaya]);
@@ -127,13 +143,90 @@ export default function CheckoutForm({
       product_name: productName,
       product_id: productId,
     });
-    trackInitiateCheckout({
-      productId,
-      productName,
-      price: unitPrice,
+  }, [productId, productName]);
+
+  const persistDraft = useCallback(() => {
+    saveCheckoutDraft(productId, {
+      step,
+      selectedColor,
+      selectedSize,
+      customerName,
+      phone,
+      wilaya,
+      commune,
+      communeManual,
+      deliveryType,
       quantity,
+      secondUnitPromo,
+      addBundle,
     });
-  }, [productId, productName, unitPrice, quantity]);
+  }, [
+    productId,
+    step,
+    selectedColor,
+    selectedSize,
+    customerName,
+    phone,
+    wilaya,
+    commune,
+    communeManual,
+    deliveryType,
+    quantity,
+    secondUnitPromo,
+    addBundle,
+  ]);
+
+  const trackAbandon = useCallback(() => {
+    if (abandonTracked.current || checkoutTracked.current) return;
+    const hasProgress =
+      selectedColor ||
+      selectedSize ||
+      customerName.trim() ||
+      phone.trim() ||
+      wilaya;
+    if (!hasProgress) return;
+    abandonTracked.current = true;
+    trackEvent('checkout_abandon', {
+      product_id: productId,
+      product_name: productName,
+      event_label: `step:${step}|last:${lastFieldRef.current}`,
+    });
+  }, [
+    productId,
+    productName,
+    step,
+    selectedColor,
+    selectedSize,
+    customerName,
+    phone,
+    wilaya,
+  ]);
+
+  const goToStep2 = () => {
+    if (hasColorStep && !selectedColor) {
+      setColorError('يرجى اختيار اللون');
+      return;
+    }
+    setColorError('');
+    trackEvent('checkout_step_1', {
+      product_id: productId,
+      product_name: productName,
+      event_label: selectedColor || 'no-color',
+    });
+    setStep(2);
+    trackEvent('checkout_step_2', {
+      product_id: productId,
+      product_name: productName,
+    });
+    trackCheckoutStart();
+    persistDraft();
+  };
+
+  const handlePhoneBlur = () => {
+    lastFieldRef.current = 'phone';
+    const msg = getPhoneValidationMessage(phone);
+    setPhoneError(msg ?? '');
+  };
 
   const whatsAppOrderUrl = useMemo(() => {
     const sizeStr = selectedSize;
@@ -163,6 +256,42 @@ export default function CheckoutForm({
   useEffect(() => {
     setLivePrice(price);
   }, [price]);
+
+  useEffect(() => {
+    const draft = loadCheckoutDraft(productId);
+    if (!draft) return;
+    if (draft.selectedColor) setSelectedColor(draft.selectedColor);
+    if (draft.selectedSize) setSelectedSize(draft.selectedSize);
+    if (draft.customerName) setCustomerName(draft.customerName);
+    if (draft.phone) setPhone(draft.phone);
+    if (draft.wilaya) setWilaya(draft.wilaya);
+    if (draft.commune) setCommune(draft.commune);
+    if (typeof draft.communeManual === 'boolean') setCommuneManual(draft.communeManual);
+    if (draft.deliveryType) setDeliveryType(draft.deliveryType);
+    if (draft.quantity) setQuantity(draft.quantity);
+    if (draft.secondUnitPromo) setSecondUnitPromo(draft.secondUnitPromo);
+    if (draft.addBundle) setAddBundle(draft.addBundle);
+    if (draft.step && draft.step >= 1 && draft.step <= totalSteps) {
+      setStep(draft.step);
+      if (draft.step >= 2) trackCheckoutStart();
+    }
+  }, [productId, totalSteps, trackCheckoutStart]);
+
+  useEffect(() => {
+    persistDraft();
+  }, [persistDraft]);
+
+  useEffect(() => {
+    const onHide = () => {
+      if (document.visibilityState === 'hidden') trackAbandon();
+    };
+    window.addEventListener('pagehide', trackAbandon);
+    document.addEventListener('visibilitychange', onHide);
+    return () => {
+      window.removeEventListener('pagehide', trackAbandon);
+      document.removeEventListener('visibilitychange', onHide);
+    };
+  }, [trackAbandon]);
 
   useEffect(() => {
     setExitDiscount(getStoredDiscount(productId));
@@ -257,11 +386,10 @@ export default function CheckoutForm({
       setCommuneError('');
     }
 
-    const cleanPhone = phone.replace(/\s/g, '');
-    const phoneRegex = /^(05|06|07)[0-9]{8}$/;
+    const cleanPhone = normalizePhoneInput(phone);
 
-    if (!phoneRegex.test(cleanPhone) && cleanPhone !== '0555555555') {
-      setPhoneError('يرجى إدخال رقم هاتف جزائري صحيح (مثال: 0550123456)');
+    if (!isValidAlgerianPhone(cleanPhone)) {
+      setPhoneError(getPhoneValidationMessage(cleanPhone) ?? 'رقم الهاتف غير صالح');
       hasError = true;
     } else {
       setPhoneError('');
@@ -313,6 +441,13 @@ export default function CheckoutForm({
     }
 
     setIsSubmitting(true);
+
+    trackInitiateCheckout({
+      productId,
+      productName,
+      price: unitPrice,
+      quantity,
+    });
 
     const colorLabel = colors.find((c) => c.id === selectedColor)?.nameAr;
     const optionNotes = [
@@ -398,6 +533,7 @@ export default function CheckoutForm({
         price: unitPrice,
       });
 
+      clearCheckoutDraft(productId);
       window.location.href = `/thank-you?total=${total}&orderId=${encodeURIComponent(orderId)}`;
     } catch {
       setSubmitError('خطأ في الاتصال. تحقق من الإنترنت وحاول مرة أخرى.');
@@ -405,10 +541,22 @@ export default function CheckoutForm({
     }
   };
 
+  const onFormSubmit = (e: React.FormEvent) => {
+    if (hasColorStep && step === 1) {
+      e.preventDefault();
+      goToStep2();
+      return;
+    }
+    handleSubmit(e);
+  };
+
+  useEffect(() => {
+    if (!hasColorStep) trackCheckoutStart();
+  }, [hasColorStep, trackCheckoutStart]);
+
   return (
     <form
-      onSubmit={handleSubmit}
-      onFocus={trackCheckoutStart}
+      onSubmit={onFormSubmit}
       className={`rounded-2xl shadow-lg p-6 md:p-8 ${
         isAutomotive
           ? 'bg-zinc-900 border border-zinc-700 text-white'
@@ -416,20 +564,83 @@ export default function CheckoutForm({
       }`}
       id="order-form"
     >
+      <CheckoutProgressBar step={step} totalSteps={totalSteps} />
+
       <div className="mb-6 text-center">
         <h3 className={`text-xl font-black mb-2 ${isAutomotive ? 'text-white' : 'text-text'}`}>
-          أطلبي دابا — الدفع كي توصلك
+          {hasColorStep && step === 1 ? 'اختاري اللون' : 'أكّدي الطلب — COD'}
         </h3>
         <p className={`text-xs ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
-          {requiresSizeInfo
-            ? 'اختاري المقاس واللون — نتصلو بيك للتأكيد قبل ما نبعثو'
-            : 'عمري المعلومات — نتصلو بيك للتأكيد'}
+          {hasColorStep && step === 1
+            ? 'الخطوة الأولى — بعدها معلومات التوصيل'
+            : '⚠️ نتصلو بيك نأكدو الطلبية قبل الإرسال'}
         </p>
       </div>
 
       <div className="space-y-4">
+        {hasColorStep && step === 1 && requiresColorInfo && colors.length > 0 && (
+          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-3">
+            <p className="text-sm font-black text-primary">اختاري اللون *</p>
+            <div className="grid gap-2 grid-cols-3">
+              {colors.map((color) => (
+                <button
+                  key={color.id}
+                  type="button"
+                  onClick={() => {
+                    setSelectedColor(color.id);
+                    setColorError('');
+                    lastFieldRef.current = 'color';
+                  }}
+                  className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
+                    selectedColor === color.id
+                      ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
+                      : 'border-gray-200 bg-white'
+                  }`}
+                >
+                  {color.image ? (
+                    <span className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 bg-secondary">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={color.image} alt={color.nameAr} className="h-full w-full object-cover object-top" />
+                    </span>
+                  ) : (
+                    <span
+                      className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
+                      style={{ backgroundColor: color.hex }}
+                    />
+                  )}
+                  <span className="text-[10px] font-bold text-text">{color.nameAr}</span>
+                </button>
+              ))}
+            </div>
+            {colorError && <p className="text-red-500 text-xs font-bold text-center">{colorError}</p>}
+            <button
+              type="submit"
+              className="w-full py-3.5 rounded-xl font-black text-white bg-primary hover:bg-primary/90 transition-colors mt-2"
+            >
+              التالي →
+            </button>
+          </div>
+        )}
+
+        {(!hasColorStep || step === 2) && (
+          <>
+        {hasColorStep && selectedColor && (
+          <div className="flex items-center justify-between text-xs bg-cream border border-secondary rounded-lg px-3 py-2">
+            <span>
+              اللون: <strong>{colors.find((c) => c.id === selectedColor)?.nameAr}</strong>
+            </span>
+            <button
+              type="button"
+              onClick={() => setStep(1)}
+              className="font-bold text-primary underline"
+            >
+              تغيير
+            </button>
+          </div>
+        )}
+
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1">الاسم واللقب *</label>
+          <label className="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل *</label>
           <input
             type="text"
             id="customer_name"
@@ -439,8 +650,12 @@ export default function CheckoutForm({
             onChange={(e) => {
               setCustomerName(e.target.value);
               setNameError('');
+              lastFieldRef.current = 'name';
             }}
-            placeholder="مثال: محمد أمين"
+            onFocus={() => {
+              lastFieldRef.current = 'name';
+            }}
+            placeholder="مثال: فاطima بن علي"
             className={`w-full px-4 py-3 rounded-xl border ${nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all`}
           />
           {nameError && <p className="text-red-500 text-xs mt-1 font-bold">{nameError}</p>}
@@ -457,6 +672,7 @@ export default function CheckoutForm({
                   onClick={() => {
                     setSelectedSize(opt.value);
                     setSizeError('');
+                    lastFieldRef.current = 'size';
                   }}
                   className={`text-right px-2.5 py-2 rounded-lg border transition-all ${
                     selectedSize === opt.value
@@ -492,65 +708,28 @@ export default function CheckoutForm({
           />
         )}
 
-        {requiresColorInfo && colors.length > 0 && (
-          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-3">
-            <div className="flex items-start gap-3">
-              <span className="text-2xl">🎨</span>
-              <div>
-                <p className="text-sm font-black text-primary">اللون *</p>
-                <p className="text-xs mt-1 text-gray-500">الألوان الأكثر طلباً عند زبائن Sitraa</p>
-              </div>
-            </div>
-            <div className={`grid gap-2 ${colors.some((c) => c.image) ? 'grid-cols-3' : 'grid-cols-3'}`}>
-              {colors.map((color) => (
-                <button
-                  key={color.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedColor(color.id);
-                    setColorError('');
-                  }}
-                  className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
-                    selectedColor === color.id
-                      ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                      : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  {color.image ? (
-                    <span className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 bg-secondary">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={color.image} alt={color.nameAr} className="h-full w-full object-cover object-top" />
-                    </span>
-                  ) : (
-                    <span
-                      className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  )}
-                  <span className="text-[10px] font-bold text-text">{color.nameAr}</span>
-                </button>
-              ))}
-            </div>
-            {colorError && <p className="text-red-500 text-xs font-bold text-center">{colorError}</p>}
-          </div>
-        )}
-
         <div>
-          <label className="block text-sm font-bold text-gray-700 mb-1">رقم الهاتف *</label>
+          <label className="block text-sm font-bold text-gray-700 mb-1">رقم التيليفون *</label>
           <input
             type="tel"
             id="phone"
             required
             dir="ltr"
+            inputMode="numeric"
             value={phone}
             onChange={(e) => {
               setPhone(e.target.value);
-              setPhoneError('');
+              if (phoneError) setPhoneError('');
+              lastFieldRef.current = 'phone';
             }}
-            placeholder="05XX XX XX XX"
+            onBlur={handlePhoneBlur}
+            placeholder="0550123456"
             className={`w-full px-4 py-3 rounded-xl border ${phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all text-right`}
           />
           {phoneError && <p className="text-red-500 text-xs mt-1 font-bold">{phoneError}</p>}
+          {!phoneError && phone.trim() && isValidAlgerianPhone(normalizePhoneInput(phone)) && (
+            <p className="text-green-600 text-xs mt-1 font-bold">✓ رقم صحيح</p>
+          )}
         </div>
 
         <div className="grid grid-cols-1 gap-4 relative z-10">
@@ -566,6 +745,7 @@ export default function CheckoutForm({
                 setWilayaError('');
                 setCommune('');
                 setCommuneManual(false);
+                lastFieldRef.current = 'wilaya';
               }}
               className={`w-full px-4 py-3 rounded-xl border text-gray-900 ${wilayaError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all bg-white appearance-auto`}
             >
@@ -749,15 +929,15 @@ export default function CheckoutForm({
             isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-accent hover:bg-accent/90 hover:shadow-xl animate-pulse-slow'
           }`}
         >
-          {isSubmitting ? 'جاري الإرسال...' : 'تأكيد الطلب — الدفع عند الاستلام'}
+          {isSubmitting ? 'جاري الإرسال...' : 'أكّدي الطلب ✓'}
         </button>
 
-        <p className="text-center text-xs text-green-700 font-bold mt-2">
-          ✓ ما تخلص حتى تستلم المنتج وتتأكد منو
+        <p className="text-center text-xs text-green-700 font-bold mt-3 leading-relaxed">
+          🤝 ما تخلصيش حتى تستلمي وتتأكدي من المنتج — الدفع عند الاستلام (COD)
         </p>
 
-        <p className="text-center text-xs text-gray-500 mt-3 flex items-center justify-center gap-1">
-          <span>🔒</span> طلب واحد لكل رقم/اتصال في اليوم — حماية من الطلبات الوهمية
+        <p className="text-center text-xs text-gray-500 mt-2 leading-relaxed">
+          💬 باش نضمنو خدمة أفضل، كل زبونة تقدر تطلب مرة وحدة فاليوم — نتصلو بيك للتأكيد
         </p>
 
         <div className="mt-5 pt-5 border-t border-gray-200">
@@ -771,6 +951,8 @@ export default function CheckoutForm({
             راسلنا على واتساب — {siteHost}
           </button>
         </div>
+          </>
+        )}
       </div>
     </form>
   );

@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import CheckoutForm from '@/components/checkout/CheckoutForm';
 import ProductGallery from '@/components/product/ProductGallery';
+import { buildProductGallerySlides } from '@/lib/product-gallery-images';
 import ProductReviews from '@/components/product/ProductReviews';
 import ConversionTrustBar from '@/components/product/ConversionTrustBar';
 import ProductPriceDisplay from '@/components/product/ProductPriceDisplay';
@@ -33,6 +34,7 @@ export default function ProductPageContent({
     product.productKind === 'sharia-set' ||
     product.collectionId === 'abayas';
   const upsellConfig = getUpsellForProduct(product.id);
+  const gallerySlides = buildProductGallerySlides(product);
 
   return (
     <div className="bg-cream min-h-screen pb-24 max-w-lg mx-auto md:max-w-none">
@@ -62,8 +64,8 @@ export default function ProductPageContent({
       )}
 
       <div className="px-4 py-5 space-y-5">
-        {product.images && product.images.length > 0 ? (
-          <ProductGallery images={product.images} productName={product.name} />
+        {gallerySlides.length > 0 ? (
+          <ProductGallery slides={gallerySlides} productName={product.name} />
         ) : (
           <div className="w-full aspect-[4/5] bg-gradient-to-br from-secondary to-cream rounded-2xl border border-secondary flex flex-col items-center justify-center shadow-sm">
             <span className="text-5xl mb-3">🧕</span>
@@ -197,8 +199,8 @@ export default function ProductPageContent({
 
         <ProductReviews
           reviews={reviews}
-          rating={product.rating}
-          reviewCount={product.reviewCount}
+          rating={reviews.length > 0 ? product.rating : undefined}
+          reviewCount={reviews.length > 0 ? product.reviewCount : undefined}
         />
       </div>
 

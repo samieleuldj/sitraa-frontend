@@ -1,11 +1,20 @@
 const SESSION_KEY = 'sitraa_sid';
 
-type EventType = 'page_view' | 'product_view' | 'checkout_start' | 'whatsapp_lead';
+export type EventType =
+  | 'page_view'
+  | 'product_view'
+  | 'checkout_start'
+  | 'checkout_step_1'
+  | 'checkout_step_2'
+  | 'checkout_abandon'
+  | 'whatsapp_lead';
 
 type TrackPayload = {
   page_path?: string;
   product_id?: string;
   product_name?: string;
+  /** آخر حقل / خطوة — لتحليل dropout */
+  event_label?: string;
 };
 
 function getApiUrl(): string {
@@ -53,6 +62,7 @@ export async function trackEvent(eventType: EventType, payload: TrackPayload = {
         page_path: payload.page_path || window.location.pathname,
         product_id: payload.product_id,
         product_name: payload.product_name,
+        event_label: payload.event_label,
         ...getUtmParams(),
       }),
       keepalive: true,
