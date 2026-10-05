@@ -243,7 +243,6 @@ export const products: Product[] = [
     images: [
       '/products/taqm-al-iffa/navy.png',
       '/products/taqm-al-iffa/black-1.png',
-      '/products/taqm-al-iffa/black-2.png',
     ],
     fabricInfo:
       'كريب مطاطي فاخر — opaque 100%، ما يبانش تحتيه، وخفيف في نفس الوقت. مناسب للصيف والشتاء.',
@@ -262,9 +261,8 @@ export const products: Product[] = [
     solutionText:
       'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
     finishingImages: [
-      { src: '/products/taqm-al-iffa/black-2.png', label: 'وشاح متعدد الطبقات' },
-      { src: '/products/taqm-al-iffa/navy.png', label: 'التغطية الكاملة — أزرق' },
-      { src: '/products/taqm-al-iffa/black-1.png', label: 'الأكمام المطاطية' },
+      { src: '/products/taqm-al-iffa/navy.png', label: 'طقم العفة — أزرق' },
+      { src: '/products/taqm-al-iffa/black-1.png', label: 'طقم العفة — أسود' },
     ],
     reviews: [],
   },
