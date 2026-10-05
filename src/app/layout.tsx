@@ -4,6 +4,7 @@ import { Cairo } from 'next/font/google';
 import './globals.css';
 import SiteChrome from '@/components/layout/SiteChrome';
 import MetaPixel from '@/components/layout/MetaPixel';
+import { readRuntimeMetaPixelId } from '@/lib/meta-pixel';
 import TrackingPixels from '@/components/layout/TrackingPixels';
 import AnalyticsTracker from '@/components/layout/AnalyticsTracker';
 import LiveStorefrontPrices from '@/components/product/LiveStorefrontPrices';
@@ -54,11 +55,13 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+  const sitePixelId = readRuntimeMetaPixelId();
+
   return (
     <html lang="ar" dir="rtl" className="scroll-smooth">
       <body className={`${cairo.className} flex flex-col min-h-screen`}>
         <JsonLd data={[organizationJsonLd(), websiteJsonLd()]} />
-        <MetaPixel />
+        <MetaPixel sitePixelId={sitePixelId} />
         <TrackingPixels />
         <Suspense fallback={null}>
           <AnalyticsTracker />

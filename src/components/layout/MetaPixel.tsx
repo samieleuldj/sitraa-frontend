@@ -5,7 +5,12 @@ import { usePathname } from 'next/navigation';
 import { getMetaPixelIdForPath, getMetaPixelIdForProduct } from '@/lib/meta-pixel';
 import { PURCHASE_STORAGE_KEY } from '@/lib/pixels';
 
-export default function MetaPixel() {
+type MetaPixelProps = {
+  /** Pixel ID من السيرفر (EasyPanel runtime env) */
+  sitePixelId?: string;
+};
+
+export default function MetaPixel({ sitePixelId = '' }: MetaPixelProps) {
   const pathname = usePathname();
   
   // Try to get pixel ID from pending purchase first (for thank-you page)
@@ -16,7 +21,7 @@ export default function MetaPixel() {
       try {
         const pending = JSON.parse(pendingRaw);
         if (pending && pending.productId) {
-          pixelId = getMetaPixelIdForProduct(pending.productId);
+          pixelId = getMetaPixelIdForProduct(pending.productId, sitePixelId);
         }
       } catch (e) {
         // ignore
@@ -26,7 +31,7 @@ export default function MetaPixel() {
 
   // Fallback to pathname if not on thank-you page or no pending purchase
   if (!pixelId) {
-    pixelId = getMetaPixelIdForPath(pathname);
+    pixelId = getMetaPixelIdForPath(pathname, sitePixelId);
   }
 
   if (!pixelId) {
@@ -46,6 +51,7 @@ export default function MetaPixel() {
           s.parentNode.insertBefore(t,s)}(window, document,'script',
           'https://connect.facebook.net/en_US/fbevents.js');
           fbq('init', '${pixelId}');
+          fbq('track', 'PageView');
         `}
       </Script>
       <noscript>

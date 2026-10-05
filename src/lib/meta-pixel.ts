@@ -1,9 +1,20 @@
 /** Meta Pixel — Sitraa (منفصل على Confort) */
 
-const SITRAA_PIXEL_ID =
-  process.env.NEXT_PUBLIC_META_PIXEL_ID ||
-  process.env.META_PIXEL_ID ||
-  '';
+const PLACEHOLDER_IDS = new Set(['your_meta_pixel_id', 'your_sitraa_pixel_id']);
+
+function normalizePixelId(value: string | undefined): string {
+  const id = (value ?? '').trim();
+  return PLACEHOLDER_IDS.has(id) ? '' : id;
+}
+
+/** Server/runtime env — يقرا Pixel ID من EasyPanel بدون rebuild */
+export function readRuntimeMetaPixelId(): string {
+  return normalizePixelId(
+    process.env.NEXT_PUBLIC_META_PIXEL_ID || process.env.META_PIXEL_ID,
+  );
+}
+
+const SITRAA_PIXEL_ID = readRuntimeMetaPixelId();
 
 const PIXEL_BY_PRODUCT: Record<string, string | undefined> = {
   'abaya-two-piece-sitraa':
@@ -17,25 +28,33 @@ const PIXEL_BY_PRODUCT: Record<string, string | undefined> = {
 };
 
 export function getDefaultMetaPixelId(): string {
-  const id = SITRAA_PIXEL_ID.trim();
-  return id === 'your_meta_pixel_id' ? '' : id;
+  return SITRAA_PIXEL_ID;
 }
 
-export function getMetaPixelIdForProduct(productId: string): string {
-  const specific = PIXEL_BY_PRODUCT[productId]?.trim();
-  if (specific && specific !== 'your_meta_pixel_id') {
-    return specific;
-  }
-  return getDefaultMetaPixelId();
+export function getMetaPixelIdForProduct(
+  productId: string,
+  fallbackPixelId = '',
+): string {
+  const specific = normalizePixelId(PIXEL_BY_PRODUCT[productId]);
+  if (specific) return specific;
+
+  return normalizePixelId(fallbackPixelId) || getDefaultMetaPixelId();
 }
 
-export function getMetaPixelIdForPath(pathname: string | null): string {
-  if (!pathname) return getDefaultMetaPixelId();
+export function getMetaPixelIdForPath(
+  pathname: string | null,
+  fallbackPixelId = '',
+): string {
+  const fallback = normalizePixelId(fallbackPixelId) || getDefaultMetaPixelId();
+  if (!pathname) return fallback;
 
   const productMatch = pathname.match(/^\/product\/([^/?#]+)/);
   if (productMatch) {
-    return getMetaPixelIdForProduct(decodeURIComponent(productMatch[1]));
+    return getMetaPixelIdForProduct(
+      decodeURIComponent(productMatch[1]),
+      fallbackPixelId,
+    );
   }
 
-  return getDefaultMetaPixelId();
+  return fallback;
 }
