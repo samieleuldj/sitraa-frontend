@@ -84,18 +84,12 @@ export default function ProductPageContent({
             <div className="mb-3 p-3 rounded-xl bg-primary/5 border border-primary/15">
               <p className="text-sm font-black text-primary mb-2">🎁 الطقم كامل — 4 قطع</p>
               <div className="grid grid-cols-4 gap-1.5 text-center">
-                {[
-                  { icon: '👗', label: 'عباية' },
-                  { icon: '🧣', label: 'غشوة' },
-                  { icon: '😷', label: 'نقاب' },
-                  { icon: '🧤', label: 'قفازات' },
-                ].map((piece) => (
+                {['عباية', 'غشوة', 'نقاب', 'قفازات'].map((label) => (
                   <div
-                    key={piece.label}
-                    className="bg-white rounded-lg py-1.5 px-1 border border-secondary"
+                    key={label}
+                    className="bg-white rounded-lg py-2 px-1 border border-secondary"
                   >
-                    <span className="text-base block">{piece.icon}</span>
-                    <span className="text-[9px] font-bold text-text">{piece.label}</span>
+                    <span className="text-[10px] font-black text-text leading-tight">{label}</span>
                   </div>
                 ))}
               </div>
