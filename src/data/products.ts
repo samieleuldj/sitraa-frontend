@@ -64,19 +64,19 @@ export const ABAYA_TWO_PIECE_COLORS: ProductColor[] = [
     id: 'olive',
     nameAr: 'زيتي',
     hex: '#4a5240',
-    image: '/products/abaya-two-piece/olive.png',
+    image: '/products/abaya-two-piece/olive.webp',
   },
   {
     id: 'brown',
     nameAr: 'مارون',
     hex: '#4a3228',
-    image: '/products/abaya-two-piece/brown.png',
+    image: '/products/abaya-two-piece/brown.webp',
   },
   {
     id: 'black',
     nameAr: 'أسود',
     hex: '#1a1a1a',
-    image: '/products/abaya-two-piece/black.png',
+    image: '/products/abaya-two-piece/black.webp',
   },
 ];
 
@@ -98,9 +98,9 @@ export const products: Product[] = [
     sizes: DEFAULT_SIZES,
     colors: ABAYA_TWO_PIECE_COLORS,
     images: [
-      '/products/abaya-two-piece/olive.png',
-      '/products/abaya-two-piece/brown.png',
-      '/products/abaya-two-piece/black.png',
+      '/products/abaya-two-piece/olive.webp',
+      '/products/abaya-two-piece/brown.webp',
+      '/products/abaya-two-piece/black.webp',
     ],
     fabricInfo:
       'قماش كريب فاخر — ناعم، خفيف، وما يتكشّرش. سقوط أنيق يبرز الستايل بدون ما يبان ثقيل.',
@@ -137,25 +137,25 @@ export const products: Product[] = [
         id: 'blue',
         nameAr: 'أزرق',
         hex: '#1e4d6b',
-        image: '/products/ensemble-two-piece/blue.png',
+        image: '/products/ensemble-two-piece/blue.webp',
       },
       {
         id: 'black',
         nameAr: 'أسود',
         hex: '#1a1a1a',
-        image: '/products/ensemble-two-piece/black.png',
+        image: '/products/ensemble-two-piece/black.webp',
       },
       {
         id: 'beige',
         nameAr: 'بيج',
         hex: '#c9b59a',
-        image: '/products/ensemble-two-piece/beige.png',
+        image: '/products/ensemble-two-piece/beige.webp',
       },
     ],
     images: [
-      '/products/ensemble-two-piece/blue.png',
-      '/products/ensemble-two-piece/black.png',
-      '/products/ensemble-two-piece/beige.png',
+      '/products/ensemble-two-piece/blue.webp',
+      '/products/ensemble-two-piece/black.webp',
+      '/products/ensemble-two-piece/beige.webp',
     ],
     fabricInfo:
       'كريب ناعم — خفيف، ما يتكشّرش، وما يلبسش الجسم. سقوط wide يعطي راحة ومحتشمة في نفس الوقت.',
@@ -174,9 +174,9 @@ export const products: Product[] = [
     solutionText:
       'Sitraa: طقم قطعتين بقماش ناعم، ستايل عصري، وألوان ترند. محتشمة وفي نفس الوقت أنيقة — تلبسيها بثقة.',
     finishingImages: [
-      { src: '/products/ensemble-two-piece/blue.png', label: 'أكمام balloon + رباطات' },
-      { src: '/products/ensemble-two-piece/beige.png', label: 'تنورة واسعة بكسرات' },
-      { src: '/products/ensemble-two-piece/black.png', label: 'ستايل كامل — أسود' },
+      { src: '/products/ensemble-two-piece/blue.webp', label: 'أكمام balloon + رباطات' },
+      { src: '/products/ensemble-two-piece/beige.webp', label: 'تنورة واسعة بكسرات' },
+      { src: '/products/ensemble-two-piece/black.webp', label: 'ستايل كامل — أسود' },
     ],
     reviews: [],
   },
@@ -231,13 +231,13 @@ export const products: Product[] = [
         id: 'navy',
         nameAr: 'أزرق',
         hex: '#1e3a5f',
-        image: '/products/taqm-al-iffa/navy.png',
+        image: '/products/taqm-al-iffa/navy.webp',
       },
       {
         id: 'black',
         nameAr: 'أسود',
         hex: '#1a1a1a',
-        image: '/products/taqm-al-iffa/black-1.png',
+        image: '/products/taqm-al-iffa/black-1.webp',
       },
     ],
     images: [
@@ -261,8 +261,8 @@ export const products: Product[] = [
     solutionText:
       'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
     finishingImages: [
-      { src: '/products/taqm-al-iffa/navy.png', label: 'طقم العفة — أزرق' },
-      { src: '/products/taqm-al-iffa/black-1.png', label: 'طقم العفة — أسود' },
+      { src: '/products/taqm-al-iffa/navy.webp', label: 'طقم العفة — أزرق' },
+      { src: '/products/taqm-al-iffa/black-1.webp', label: 'طقم العفة — أسود' },
     ],
     reviews: [],
   },
