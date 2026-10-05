@@ -1,3 +1,3 @@
-export const STORE_PHONE = '0700000000';
-export const STORE_PHONE_DISPLAY = '07XX XX XX XX';
-export const STORE_WHATSAPP_URL = 'https://wa.me/213700000000';
+export const STORE_PHONE = '0782527923';
+export const STORE_PHONE_DISPLAY = '0782 52 79 23';
+export const STORE_WHATSAPP_URL = 'https://wa.me/213782527923';
