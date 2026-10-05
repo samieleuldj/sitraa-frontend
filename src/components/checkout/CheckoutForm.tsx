@@ -19,7 +19,6 @@ import {
 import { LIVE_PRICE_EVENT } from '@/components/product/LiveStorefrontPrices';
 import { getSiteDisplayUrl } from '@/lib/store-brand';
 import CheckoutUpsellOffers from '@/components/checkout/CheckoutUpsellOffers';
-import CheckoutProgressBar from '@/components/checkout/CheckoutProgressBar';
 import type { ProductColor } from '@/data/products';
 import { DEFAULT_SIZE_VALUES, SIZE_OPTIONS, type SizeOption } from '@/data/sizes';
 import { bundlePrefKey, getUpsellForProduct } from '@/data/upsells';
@@ -113,10 +112,6 @@ export default function CheckoutForm({
   const upsellConfig = getUpsellForProduct(productId);
   const needsColor = requiresColorInfo && colors.length > 0;
   const needsSize = requiresSizeInfo && formSizeOptions.length > 0;
-  const hasOptionsStep = needsColor || needsSize;
-  const totalSteps = hasOptionsStep ? 2 : 1;
-  const [step, setStep] = useState(1);
-  const stepLabels = hasOptionsStep ? ['اللون والمقاس', 'معلومات التوصيل'] : undefined;
 
   const shippingRate = useMemo(() => getShippingRate(wilaya), [wilaya]);
   const communes = useMemo(() => getCommunesForWilaya(wilaya), [wilaya]);
@@ -150,7 +145,6 @@ export default function CheckoutForm({
 
   const persistDraft = useCallback(() => {
     saveCheckoutDraft(productId, {
-      step,
       selectedColor,
       selectedSize,
       customerName,
@@ -165,7 +159,6 @@ export default function CheckoutForm({
     });
   }, [
     productId,
-    step,
     selectedColor,
     selectedSize,
     customerName,
@@ -192,51 +185,17 @@ export default function CheckoutForm({
     trackEvent('checkout_abandon', {
       product_id: productId,
       product_name: productName,
-      event_label: `step:${step}|last:${lastFieldRef.current}`,
+      event_label: `last:${lastFieldRef.current}`,
     });
   }, [
     productId,
     productName,
-    step,
     selectedColor,
     selectedSize,
     customerName,
     phone,
     wilaya,
   ]);
-
-  const goToStep2 = () => {
-    let hasError = false;
-
-    if (needsColor && !selectedColor) {
-      setColorError('اختاري اللون');
-      hasError = true;
-    } else {
-      setColorError('');
-    }
-
-    if (needsSize && !selectedSize) {
-      setSizeError('اختاري المقاس');
-      hasError = true;
-    } else {
-      setSizeError('');
-    }
-
-    if (hasError) return;
-
-    trackEvent('checkout_step_1', {
-      product_id: productId,
-      product_name: productName,
-      event_label: [selectedColor, selectedSize].filter(Boolean).join('|') || 'options',
-    });
-    setStep(2);
-    trackEvent('checkout_step_2', {
-      product_id: productId,
-      product_name: productName,
-    });
-    trackCheckoutStart();
-    persistDraft();
-  };
 
   const handlePhoneBlur = () => {
     lastFieldRef.current = 'phone';
@@ -287,11 +246,7 @@ export default function CheckoutForm({
     if (draft.quantity) setQuantity(draft.quantity);
     if (draft.secondUnitPromo) setSecondUnitPromo(draft.secondUnitPromo);
     if (draft.addBundle) setAddBundle(draft.addBundle);
-    if (draft.step && draft.step >= 1 && draft.step <= totalSteps) {
-      setStep(draft.step);
-      if (draft.step >= 2) trackCheckoutStart();
-    }
-  }, [productId, totalSteps, trackCheckoutStart]);
+  }, [productId]);
 
   useEffect(() => {
     persistDraft();
@@ -557,22 +512,13 @@ export default function CheckoutForm({
     }
   };
 
-  const onFormSubmit = (e: React.FormEvent) => {
-    if (hasOptionsStep && step === 1) {
-      e.preventDefault();
-      goToStep2();
-      return;
-    }
-    handleSubmit(e);
-  };
-
   useEffect(() => {
-    if (!hasOptionsStep) trackCheckoutStart();
-  }, [hasOptionsStep, trackCheckoutStart]);
+    trackCheckoutStart();
+  }, [trackCheckoutStart]);
 
   return (
     <form
-      onSubmit={onFormSubmit}
+      onSubmit={handleSubmit}
       className={`rounded-2xl shadow-lg p-6 md:p-8 ${
         isAutomotive
           ? 'bg-zinc-900 border border-zinc-700 text-white'
@@ -580,22 +526,18 @@ export default function CheckoutForm({
       }`}
       id="order-form"
     >
-      <CheckoutProgressBar step={step} totalSteps={totalSteps} stepLabels={stepLabels} />
-
       <div className="mb-6 text-center">
         <h3 className={`text-xl font-black mb-2 ${isAutomotive ? 'text-white' : 'text-text'}`}>
-          {hasOptionsStep && step === 1 ? 'اختاري اللون والمقاس' : 'أكّدي التوصيل — COD'}
+          أكّدي الطلب — COD
         </h3>
         <p className={`text-xs ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
-          {hasOptionsStep && step === 1
-            ? 'خطوة بسيطة — بعدها الاسم والهاتف والعنوان'
-            : '⚠️ نتصلو بيك نأكدو الطلبية قبل الإرسال'}
+          ⚠️ نتصلو بيك نأكدو الطلبية قبل الإرسال
         </p>
       </div>
 
       <div className="space-y-4">
-        {hasOptionsStep && step === 1 && (
-          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-5">
+        {(needsColor || needsSize) && (
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-4">
             {needsColor && (
               <div className="space-y-2">
                 <p className="text-sm font-black text-text">اللون *</p>
@@ -654,41 +596,12 @@ export default function CheckoutForm({
                 {sizeError && <p className="text-red-500 text-xs font-bold text-center">{sizeError}</p>}
               </div>
             )}
-
-            <button
-              type="submit"
-              className="w-full py-3.5 rounded-xl font-black text-white bg-primary hover:bg-primary/90 transition-colors"
-            >
-              التالي — معلومات التوصيل →
-            </button>
           </div>
         )}
 
-        {(!hasOptionsStep || step === 2) && (
-          <>
-        {hasOptionsStep && (selectedColor || selectedSize) && (
-          <div className="flex items-center justify-between gap-2 text-xs bg-cream border border-secondary rounded-lg px-3 py-2.5">
-            <div className="flex flex-wrap gap-x-3 gap-y-1">
-              {selectedColor && (
-                <span>
-                  اللون: <strong>{colors.find((c) => c.id === selectedColor)?.nameAr}</strong>
-                </span>
-              )}
-              {selectedSize && (
-                <span>
-                  المقاس: <strong>{selectedSize}</strong>
-                </span>
-              )}
-            </div>
-            <button
-              type="button"
-              onClick={() => setStep(1)}
-              className="font-bold text-primary underline shrink-0"
-            >
-              تغيير
-            </button>
-          </div>
-        )}
+        <div className="pt-1 border-t border-gray-100">
+          <p className="text-xs font-bold text-gray-500 mb-4">معلومات التوصيل</p>
+        </div>
 
         <div>
           <label className="block text-sm font-bold text-gray-700 mb-1">الاسم الكامل *</label>
@@ -969,8 +882,6 @@ export default function CheckoutForm({
             راسلنا على واتساب — {siteHost}
           </button>
         </div>
-          </>
-        )}
       </div>
     </form>
   );
