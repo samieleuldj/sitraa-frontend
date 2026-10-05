@@ -111,9 +111,12 @@ export default function CheckoutForm({
   const abandonTracked = useRef(false);
   const lastFieldRef = useRef('none');
   const upsellConfig = getUpsellForProduct(productId);
-  const hasColorStep = requiresColorInfo && colors.length > 0;
-  const totalSteps = hasColorStep ? 2 : 1;
-  const [step, setStep] = useState(hasColorStep ? 1 : 1);
+  const needsColor = requiresColorInfo && colors.length > 0;
+  const needsSize = requiresSizeInfo && formSizeOptions.length > 0;
+  const hasOptionsStep = needsColor || needsSize;
+  const totalSteps = hasOptionsStep ? 2 : 1;
+  const [step, setStep] = useState(1);
+  const stepLabels = hasOptionsStep ? ['اللون والمقاس', 'معلومات التوصيل'] : undefined;
 
   const shippingRate = useMemo(() => getShippingRate(wilaya), [wilaya]);
   const communes = useMemo(() => getCommunesForWilaya(wilaya), [wilaya]);
@@ -203,15 +206,28 @@ export default function CheckoutForm({
   ]);
 
   const goToStep2 = () => {
-    if (hasColorStep && !selectedColor) {
-      setColorError('يرجى اختيار اللون');
-      return;
+    let hasError = false;
+
+    if (needsColor && !selectedColor) {
+      setColorError('اختاري اللون');
+      hasError = true;
+    } else {
+      setColorError('');
     }
-    setColorError('');
+
+    if (needsSize && !selectedSize) {
+      setSizeError('اختاري المقاس');
+      hasError = true;
+    } else {
+      setSizeError('');
+    }
+
+    if (hasError) return;
+
     trackEvent('checkout_step_1', {
       product_id: productId,
       product_name: productName,
-      event_label: selectedColor || 'no-color',
+      event_label: [selectedColor, selectedSize].filter(Boolean).join('|') || 'options',
     });
     setStep(2);
     trackEvent('checkout_step_2', {
@@ -542,7 +558,7 @@ export default function CheckoutForm({
   };
 
   const onFormSubmit = (e: React.FormEvent) => {
-    if (hasColorStep && step === 1) {
+    if (hasOptionsStep && step === 1) {
       e.preventDefault();
       goToStep2();
       return;
@@ -551,8 +567,8 @@ export default function CheckoutForm({
   };
 
   useEffect(() => {
-    if (!hasColorStep) trackCheckoutStart();
-  }, [hasColorStep, trackCheckoutStart]);
+    if (!hasOptionsStep) trackCheckoutStart();
+  }, [hasOptionsStep, trackCheckoutStart]);
 
   return (
     <form
@@ -564,75 +580,110 @@ export default function CheckoutForm({
       }`}
       id="order-form"
     >
-      <CheckoutProgressBar step={step} totalSteps={totalSteps} />
+      <CheckoutProgressBar step={step} totalSteps={totalSteps} stepLabels={stepLabels} />
 
       <div className="mb-6 text-center">
         <h3 className={`text-xl font-black mb-2 ${isAutomotive ? 'text-white' : 'text-text'}`}>
-          {hasColorStep && step === 1 ? 'اختاري اللون' : 'أكّدي الطلب — COD'}
+          {hasOptionsStep && step === 1 ? 'اختاري اللون والمقاس' : 'أكّدي التوصيل — COD'}
         </h3>
         <p className={`text-xs ${isAutomotive ? 'text-zinc-400' : 'text-gray-500'}`}>
-          {hasColorStep && step === 1
-            ? 'الخطوة الأولى — بعدها معلومات التوصيل'
+          {hasOptionsStep && step === 1
+            ? 'خطوة بسيطة — بعدها الاسم والهاتف والعنوان'
             : '⚠️ نتصلو بيك نأكدو الطلبية قبل الإرسال'}
         </p>
       </div>
 
       <div className="space-y-4">
-        {hasColorStep && step === 1 && requiresColorInfo && colors.length > 0 && (
-          <div className="rounded-xl border-2 border-primary/30 bg-gradient-to-b from-primary/5 to-white p-4 space-y-3">
-            <p className="text-sm font-black text-primary">اختاري اللون *</p>
-            <div className="grid gap-2 grid-cols-3">
-              {colors.map((color) => (
-                <button
-                  key={color.id}
-                  type="button"
-                  onClick={() => {
-                    setSelectedColor(color.id);
-                    setColorError('');
-                    lastFieldRef.current = 'color';
-                  }}
-                  className={`flex flex-col items-center gap-1.5 p-2 rounded-xl border transition-all ${
-                    selectedColor === color.id
-                      ? 'border-primary bg-primary/10 ring-2 ring-primary/30'
-                      : 'border-gray-200 bg-white'
-                  }`}
-                >
-                  {color.image ? (
-                    <span className="relative w-full aspect-[3/4] rounded-lg overflow-hidden border border-gray-200 bg-secondary">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={color.image} alt={color.nameAr} className="h-full w-full object-cover object-top" />
-                    </span>
-                  ) : (
-                    <span
-                      className="w-8 h-8 rounded-full border border-gray-200 shadow-inner"
-                      style={{ backgroundColor: color.hex }}
-                    />
-                  )}
-                  <span className="text-[10px] font-bold text-text">{color.nameAr}</span>
-                </button>
-              ))}
-            </div>
-            {colorError && <p className="text-red-500 text-xs font-bold text-center">{colorError}</p>}
+        {hasOptionsStep && step === 1 && (
+          <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-5">
+            {needsColor && (
+              <div className="space-y-2">
+                <p className="text-sm font-black text-text">اللون *</p>
+                <div className={`grid gap-2 ${colors.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  {colors.map((color) => (
+                    <button
+                      key={color.id}
+                      type="button"
+                      onClick={() => {
+                        setSelectedColor(color.id);
+                        setColorError('');
+                        lastFieldRef.current = 'color';
+                      }}
+                      className={`flex items-center justify-center gap-2 py-3 px-3 rounded-xl border-2 transition-all ${
+                        selectedColor === color.id
+                          ? 'border-primary bg-white shadow-sm'
+                          : 'border-gray-200 bg-white hover:border-primary/40'
+                      }`}
+                    >
+                      <span
+                        className="w-5 h-5 rounded-full border border-gray-200 shrink-0"
+                        style={{ backgroundColor: color.hex }}
+                      />
+                      <span className="text-sm font-bold text-text">{color.nameAr}</span>
+                    </button>
+                  ))}
+                </div>
+                {colorError && <p className="text-red-500 text-xs font-bold text-center">{colorError}</p>}
+              </div>
+            )}
+
+            {needsSize && (
+              <div className="space-y-2">
+                <p className="text-sm font-black text-text">المقاس *</p>
+                <div className={`grid gap-2 ${formSizeOptions.length > 2 ? 'grid-cols-3' : 'grid-cols-2'}`}>
+                  {formSizeOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => {
+                        setSelectedSize(opt.value);
+                        setSizeError('');
+                        lastFieldRef.current = 'size';
+                      }}
+                      className={`py-3 px-2 rounded-xl border-2 text-center transition-all ${
+                        selectedSize === opt.value
+                          ? 'border-primary bg-white text-primary shadow-sm'
+                          : 'border-gray-200 bg-white hover:border-primary/40'
+                      }`}
+                    >
+                      <span className="block text-sm font-black">{opt.value}</span>
+                      <span className="block text-[10px] text-gray-500 mt-0.5">{opt.tag}</span>
+                    </button>
+                  ))}
+                </div>
+                {sizeError && <p className="text-red-500 text-xs font-bold text-center">{sizeError}</p>}
+              </div>
+            )}
+
             <button
               type="submit"
-              className="w-full py-3.5 rounded-xl font-black text-white bg-primary hover:bg-primary/90 transition-colors mt-2"
+              className="w-full py-3.5 rounded-xl font-black text-white bg-primary hover:bg-primary/90 transition-colors"
             >
-              التالي →
+              التالي — معلومات التوصيل →
             </button>
           </div>
         )}
 
-        {(!hasColorStep || step === 2) && (
+        {(!hasOptionsStep || step === 2) && (
           <>
-        {hasColorStep && selectedColor && (
-          <div className="flex items-center justify-between text-xs bg-cream border border-secondary rounded-lg px-3 py-2">
-            <span>
-              اللون: <strong>{colors.find((c) => c.id === selectedColor)?.nameAr}</strong>
-            </span>
+        {hasOptionsStep && (selectedColor || selectedSize) && (
+          <div className="flex items-center justify-between gap-2 text-xs bg-cream border border-secondary rounded-lg px-3 py-2.5">
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              {selectedColor && (
+                <span>
+                  اللون: <strong>{colors.find((c) => c.id === selectedColor)?.nameAr}</strong>
+                </span>
+              )}
+              {selectedSize && (
+                <span>
+                  المقاس: <strong>{selectedSize}</strong>
+                </span>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => setStep(1)}
-              className="font-bold text-primary underline"
+              className="font-bold text-primary underline shrink-0"
             >
               تغيير
             </button>
@@ -660,39 +711,6 @@ export default function CheckoutForm({
           />
           {nameError && <p className="text-red-500 text-xs mt-1 font-bold">{nameError}</p>}
         </div>
-
-        {requiresSizeInfo && (
-          <div className="rounded-lg border border-primary/20 bg-primary/5 p-3 space-y-2">
-            <p className="text-xs font-black text-primary">المقاس *</p>
-            <div className={`grid gap-2 ${formSizeOptions.length > 2 ? 'grid-cols-2' : 'grid-cols-2'}`}>
-              {formSizeOptions.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => {
-                    setSelectedSize(opt.value);
-                    setSizeError('');
-                    lastFieldRef.current = 'size';
-                  }}
-                  className={`text-right px-2.5 py-2 rounded-lg border transition-all ${
-                    selectedSize === opt.value
-                      ? 'border-primary bg-white font-bold text-primary shadow-sm'
-                      : 'border-secondary/80 bg-white text-text'
-                  }`}
-                >
-                  <div className="flex items-center justify-between gap-1 mb-0.5">
-                    <span className="text-xs font-black">{opt.value}</span>
-                    <span className="text-[9px] font-bold text-mocha/70 bg-cream px-1.5 py-0.5 rounded-full">
-                      {opt.tag}
-                    </span>
-                  </div>
-                  <p className="text-[10px] text-gray-500 leading-tight">{opt.hint}</p>
-                </button>
-              ))}
-            </div>
-            {sizeError && <p className="text-red-500 text-[10px] font-bold">{sizeError}</p>}
-          </div>
-        )}
 
         {upsellConfig && (upsellConfig.secondUnitDiscount || upsellConfig.bundle) && (
           <CheckoutUpsellOffers
