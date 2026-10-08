@@ -10,7 +10,7 @@ import sharp from 'sharp';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(__dirname, '../public/products');
 
-const FOLDERS = ['taqm-al-iffa', 'ensemble-two-piece', 'abaya-two-piece'];
+const FOLDERS = ['taqm-al-iffa', 'ensemble-two-piece', 'abaya-two-piece', 'ensemble-abaya-khimar'];
 
 async function optimizeFile(filePath) {
   const before = fs.statSync(filePath).size;

@@ -59,6 +59,39 @@ export const DEFAULT_HIJAB_COLORS: ProductColor[] = [
   { id: 'cream', nameAr: 'كريمي', hex: '#f0e6d8' },
 ];
 
+export const ENSEMBLE_ABAYA_KHIMAR_COLORS: ProductColor[] = [
+  {
+    id: 'olive',
+    nameAr: 'زيتي',
+    hex: '#4A5D23',
+    image: '/products/ensemble-abaya-khimar/olive.webp',
+  },
+  {
+    id: 'bordeaux',
+    nameAr: 'بوردو',
+    hex: '#722F37',
+    image: '/products/ensemble-abaya-khimar/bordeaux.webp',
+  },
+  {
+    id: 'mauve',
+    nameAr: 'موف',
+    hex: '#9B6B7C',
+    image: '/products/ensemble-abaya-khimar/mauve.webp',
+  },
+  {
+    id: 'chocolate',
+    nameAr: 'شوكولات + خمار كحلي',
+    hex: '#3D2314',
+    image: '/products/ensemble-abaya-khimar/chocolate.webp',
+  },
+  {
+    id: 'slate-blue',
+    nameAr: 'أزرق أردواز',
+    hex: '#5C6B7A',
+    image: '/products/ensemble-abaya-khimar/slate-blue.webp',
+  },
+];
+
 export const ABAYA_TWO_PIECE_COLORS: ProductColor[] = [
   {
     id: 'olive',
@@ -83,6 +116,50 @@ export const ABAYA_TWO_PIECE_COLORS: ProductColor[] = [
 export const DEFAULT_SIZES = DEFAULT_SIZE_VALUES;
 
 export const products: Product[] = [
+  {
+    id: 'ensemble-abaya-khimar-sitraa',
+    collectionId: 'abayas',
+    productKind: 'abaya',
+    name: 'طقم عباية + خمار layered — Sitraa',
+    description:
+      'طقم محتشم من قطعتين: عباية layered بأكمام volants وأزرار لآلئ + خمار متناسق. خامة كريب ناعمة، سقوط أنيق، وستايل عصري للخروج والمناسبات.',
+    price: 3900,
+    oldPrice: 5200,
+    badge: 'جديد ✨',
+    requiresSizeInfo: true,
+    requiresColorInfo: true,
+    sizes: DEFAULT_SIZES,
+    colors: ENSEMBLE_ABAYA_KHIMAR_COLORS,
+    images: [
+      '/products/ensemble-abaya-khimar/olive.webp',
+      '/products/ensemble-abaya-khimar/bordeaux.webp',
+      '/products/ensemble-abaya-khimar/mauve.webp',
+      '/products/ensemble-abaya-khimar/chocolate.webp',
+      '/products/ensemble-abaya-khimar/slate-blue.webp',
+    ],
+    fabricInfo:
+      'كريب فاخر — opaque، ناعم، خفيف، وما يتكشّرش. تنورة layered/tiered تعطي volume أنيق بدون ثقل.',
+    careInstructions: 'غسل يدوي أو غسالة 30°C — تجفيف طبيعي — كي على درجة منخفضة.',
+    stitchNote: 'أكمام منفوشة + أزرار زينة — خياطة متقنة',
+    features: [
+      'طقم قطعتين — عباية + خمار',
+      'تنورة layered/tiered — ستايل 2026',
+      'أكمام volants بأزرار لآلئ',
+      '5 ألوان: زيتي، بوردو، موف، شوكولات، أزرق أردواز',
+      'مقاس 38–42 و 44–50',
+      'مناسب للخروج، المناسبات، واليومي',
+    ],
+    problemText:
+      'طقم رخيص، قماش شفاف، أو لون ما يطابقش الصورة — وتندمي بعد ما تشري online.',
+    solutionText:
+      'Sitraa: طقم layered بجودة واضحة، 5 ألوان trending، ومقاسات 38–42 و 44–50. نتصلو بيك للتأكيد قبل الإرسال.',
+    finishingImages: [
+      { src: '/products/ensemble-abaya-khimar/olive.webp', label: 'ستايل layered — زيتي' },
+      { src: '/products/ensemble-abaya-khimar/bordeaux.webp', label: 'بوردو — أناقة كلاسيك' },
+      { src: '/products/ensemble-abaya-khimar/mauve.webp', label: 'موف — لون ترند' },
+    ],
+    reviews: [],
+  },
   {
     id: 'abaya-two-piece-sitraa',
     collectionId: 'abayas',
