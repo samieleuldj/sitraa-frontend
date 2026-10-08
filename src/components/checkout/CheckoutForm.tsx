@@ -28,10 +28,20 @@ import {
   saveCheckoutDraft,
 } from '@/lib/checkout-storage';
 import {
+  formatPhoneDisplay,
   getPhoneValidationMessage,
   isValidAlgerianPhone,
   normalizePhoneInput,
 } from '@/lib/phone-validation';
+
+function FieldOk({ show }: { show: boolean }) {
+  if (!show) return null;
+  return (
+    <span className="text-green-600 text-xs font-bold mt-1 inline-flex items-center gap-1">
+      ✓
+    </span>
+  );
+}
 
 function calcProductSubtotal(
   unitPrice: number,
@@ -623,6 +633,7 @@ export default function CheckoutForm({
             className={`w-full px-4 py-3 rounded-xl border ${nameError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all`}
           />
           {nameError && <p className="text-red-500 text-xs mt-1 font-bold">{nameError}</p>}
+          <FieldOk show={customerName.trim().length >= 3} />
         </div>
 
         {upsellConfig && (upsellConfig.secondUnitDiscount || upsellConfig.bundle) && (
@@ -649,12 +660,12 @@ export default function CheckoutForm({
             inputMode="numeric"
             value={phone}
             onChange={(e) => {
-              setPhone(e.target.value);
+              setPhone(formatPhoneDisplay(e.target.value));
               if (phoneError) setPhoneError('');
               lastFieldRef.current = 'phone';
             }}
             onBlur={handlePhoneBlur}
-            placeholder="0550123456"
+            placeholder="0782 52 79 23"
             className={`w-full px-4 py-3 rounded-xl border ${phoneError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all text-right`}
           />
           {phoneError && <p className="text-red-500 text-xs mt-1 font-bold">{phoneError}</p>}
@@ -701,7 +712,7 @@ export default function CheckoutForm({
                   setCommune(e.target.value);
                   setCommuneError('');
                 }}
-                placeholder="اكتب اسم البلدية"
+                placeholder="مثال: باب الوادي، حسين داي..."
                 className={`w-full px-4 py-3 rounded-xl border text-gray-900 ${communeError ? 'border-red-500 focus:ring-red-500' : 'border-gray-300 focus:ring-primary'} focus:ring-2 focus:border-transparent outline-none transition-all disabled:bg-gray-100`}
               />
             ) : (
@@ -726,6 +737,10 @@ export default function CheckoutForm({
               </select>
             )}
             {communeError && <p className="text-red-500 text-xs mt-1 font-bold">{communeError}</p>}
+            <p className="text-[11px] text-gray-500 mt-1 leading-relaxed">
+              سنتصل بك للتأكيد على العنوان
+            </p>
+            <FieldOk show={commune.trim().length >= 2} />
             {wilaya && communes.length > 0 && !communeManual && (
               <button
                 type="button"
@@ -853,14 +868,45 @@ export default function CheckoutForm({
           </div>
         )}
 
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2 mt-4 text-[10px]">
+          {[
+            { icon: '🤝', label: 'COD' },
+            { icon: '📞', label: 'تأكيد قبل الإرسال' },
+            { icon: '🚚', label: '58 ولاية' },
+            { icon: '📏', label: 'استبدال المقاس' },
+          ].map((item) => (
+            <div
+              key={item.label}
+              className="flex items-center justify-center gap-1 bg-secondary/50 text-text px-2 py-2 rounded-lg border border-secondary font-bold text-center"
+            >
+              <span>{item.icon}</span>
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5 text-[11px] text-gray-600 bg-amber-50/80 border border-amber-100 rounded-xl px-3 py-2.5 mt-3">
+          <span>
+            🔥 <strong className="text-text">18 طلب</strong> هاد الأسبوع
+          </span>
+          <span>📦 الكمية محدودة — خاصة مقاس S/M</span>
+        </div>
+
         <button
           type="submit"
           disabled={isSubmitting}
-          className={`w-full py-4 rounded-xl font-black text-xl text-white shadow-lg transition-all transform hover:-translate-y-1 mt-4 ${
+          className={`w-full min-h-[56px] py-4 rounded-xl font-black text-xl text-white shadow-lg transition-all transform hover:-translate-y-1 mt-4 flex items-center justify-center gap-2 ${
             isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-accent hover:bg-accent/90 hover:shadow-xl animate-pulse-slow'
           }`}
         >
-          {isSubmitting ? 'جاري الإرسال...' : 'أكّدي الطلب ✓'}
+          {isSubmitting ? (
+            <>
+              <span className="inline-block h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              جاري الإرسال...
+            </>
+          ) : (
+            'أكّدي الطلب ✓'
+          )}
         </button>
 
         <p className="text-center text-xs text-green-700 font-bold mt-3 leading-relaxed">

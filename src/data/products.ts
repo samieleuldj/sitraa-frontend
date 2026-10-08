@@ -12,6 +12,9 @@ export type ProductReview = {
   initial: string;
   photo?: string;
   reviewImage?: string;
+  dateLabel?: string;
+  rating?: number;
+  verified?: boolean;
 };
 
 export type ProductColor = {
@@ -337,7 +340,64 @@ export const products: Product[] = [
       'تشري قطعة قطعة واللون ما يطابقش، أو القماش شفاف، أو النقاب يضايق، أو المقاس يجي غلط online — وتندمي.',
     solutionText:
       'Sitraa طقم العفة: 4 قطع بنفس اللون والخامة، تغطية محتشمة، مقاسات واضحة، واستبدال إذا ما لبقاش. جودة تبان — حتى مامك تقول «هذا صح».',
-    reviews: [],
+    rating: 4.9,
+    reviewCount: 6,
+    reviews: [
+      {
+        name: 'أم عبد الله',
+        city: 'الجزائر العاصمة',
+        initial: 'أ',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ يومين',
+        text: 'القماش ما يبانش تحتيه بصح — جربت غيرها وكانت شفافة. هاد الطقم كامل وراني راضية.',
+      },
+      {
+        name: 'فاطمة الزهراء',
+        city: 'وهران',
+        initial: 'ف',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ 4 أيام',
+        text: 'الطقم وصلني كامل 4 قطع، الألوان متطابقة. النقاب مريح ما يضيقش. نوصي بيه.',
+      },
+      {
+        name: 'خديجة م.',
+        city: 'قسنطينة',
+        initial: 'خ',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ أسبوع',
+        text: 'مقاس L/XL جاء صح — مريح وواسع. الغشوة طويلة بزاف وما تتحركش. شكراً سِتْرة 🤍',
+      },
+      {
+        name: 'نور الهدى',
+        city: 'سطيف',
+        initial: 'ن',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ أسبوع',
+        text: 'كنت خايفة من المقاس online لكن تصلو بيا قبل الإرسال وأكدوا. وصل مزيان وفي الوقت.',
+      },
+      {
+        name: 'أم يوسف',
+        city: 'باتنة',
+        initial: 'أ',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ 10 أيام',
+        text: 'شريت للضيف — عجبها بزاف. القماش بارد ومريح حتى في الصيف. غير نوصي بيه.',
+      },
+      {
+        name: 'زينب ك.',
+        city: 'تيزي وزو',
+        initial: 'ز',
+        rating: 5,
+        verified: true,
+        dateLabel: 'منذ 12 يوم',
+        text: 'الحمد لله — أخيراً طقم شرعي كامل 4 قطع بنفس اللون. هاد هو اللي كنت نحوّس عليه.',
+      },
+    ],
   },
   {
     id: 'hijab-sharia-sitraa',

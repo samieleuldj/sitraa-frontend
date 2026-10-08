@@ -1,11 +1,28 @@
 'use client';
 
+import { useMemo } from 'react';
+import { usePathname } from 'next/navigation';
 import { STORE_WHATSAPP_URL } from '@/lib/store';
 
+const PRODUCT_WHATSAPP_DEFAULTS: Record<string, string> = {
+  'taqm-al-iffa-sitraa':
+    'سلام، بغيت نطلب طقم العفة — Sitraa (5900 دج — COD). المقاس: [size] اللون: [color]',
+};
+
 export default function WhatsAppFloat() {
+  const pathname = usePathname();
+  const href = useMemo(() => {
+    const match = pathname?.match(/^\/product\/([^/]+)$/);
+    const productId = match?.[1];
+    const template =
+      (productId && PRODUCT_WHATSAPP_DEFAULTS[productId]) ||
+      'سلام، بغيت نطلب من Sitraa (COD — 58 ولاية).';
+    return `${STORE_WHATSAPP_URL}?text=${encodeURIComponent(template)}`;
+  }, [pathname]);
+
   return (
     <a
-      href={STORE_WHATSAPP_URL}
+      href={href}
       target="_blank"
       rel="noopener noreferrer"
       aria-label="تواصلي معنا عبر واتساب"

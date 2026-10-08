@@ -19,10 +19,16 @@ export async function generateMetadata({
 
   const product = await getProductWithLivePrice(base);
 
+  const ogImage =
+    product.id === 'taqm-al-iffa-sitraa'
+      ? '/og/taqm-al-iffa.jpg'
+      : product.images?.[0] || siteConfig.defaultOgImage;
+
   return buildPageMetadata({
     title: `${product.name} — ${product.price} دج | ${siteConfig.nameAr}`,
     description: product.description,
     path: `/product/${product.id}`,
+    image: ogImage,
     keywords: [product.name, siteConfig.nameAr, 'حجاب', 'دفع عند الاستلام'],
   });
 }

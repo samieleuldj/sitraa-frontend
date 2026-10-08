@@ -62,10 +62,19 @@ export default function ProductPriceDisplay({
   const unitPrice = livePrice - discount;
   const sizeClass =
     size === 'xl' ? 'text-2xl' : size === 'lg' ? 'text-xl' : 'text-lg';
+  const discountPercent =
+    liveOldPrice && liveOldPrice > livePrice
+      ? Math.round(((liveOldPrice - livePrice) / liveOldPrice) * 100)
+      : null;
 
   return (
-    <div className="flex items-center gap-4 flex-wrap">
+    <div className="flex items-center gap-3 flex-wrap">
       <span className={`${sizeClass} font-black text-primary`}>{unitPrice} دج</span>
+      {discountPercent != null && discountPercent > 0 && (
+        <span className="text-xs font-black text-white bg-teal-600 px-2.5 py-1 rounded-full">
+          خصم {discountPercent}% 🎉
+        </span>
+      )}
       {(liveOldPrice || discount > 0) && (
         <div className="flex flex-col">
           {(liveOldPrice || discount > 0) && (
