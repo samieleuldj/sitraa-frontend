@@ -28,6 +28,8 @@ import UpsellPromoBanner from '@/components/product/UpsellPromoBanner';
 
 import ProductDetailCards from '@/components/product/ProductDetailCards';
 
+import ConversionTrustBar from '@/components/product/ConversionTrustBar';
+
 import type { Product, ProductReview } from '@/data/products';
 
 import { getUpsellForProduct } from '@/data/upsells';
@@ -258,6 +260,36 @@ export default function ProductPageContent({
 
 
 
+        <div className="scroll-mt-4 space-y-4">
+
+          <UpsellPromoBanner unitPrice={product.price} config={upsellConfig} />
+
+          <CheckoutForm
+
+            productId={product.id}
+
+            productName={product.name}
+
+            price={product.price}
+
+            requiresSizeInfo={product.requiresSizeInfo}
+
+            requiresColorInfo={product.requiresColorInfo}
+
+            sizes={product.sizes}
+
+            sizeOptions={product.sizeOptions}
+
+            colors={product.colors}
+
+          />
+
+          <ConversionTrustBar />
+
+        </div>
+
+
+
         <HijabCraftDetails
 
           fabricInfo={product.fabricInfo}
@@ -381,34 +413,6 @@ export default function ProductPageContent({
           reviewCount={reviews.length > 0 ? product.reviewCount : undefined}
 
         />
-
-
-
-        <div className="scroll-mt-4 space-y-4">
-
-          <UpsellPromoBanner unitPrice={product.price} config={upsellConfig} />
-
-          <CheckoutForm
-
-            productId={product.id}
-
-            productName={product.name}
-
-            price={product.price}
-
-            requiresSizeInfo={product.requiresSizeInfo}
-
-            requiresColorInfo={product.requiresColorInfo}
-
-            sizes={product.sizes}
-
-            sizeOptions={product.sizeOptions}
-
-            colors={product.colors}
-
-          />
-
-        </div>
 
 
 
